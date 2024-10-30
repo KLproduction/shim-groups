@@ -7,9 +7,10 @@ const Logo = ({ size }: Props) => {
         case "small":
             return (
                 <div className="relative">
-                    <p className=" font-black text-3xl text-zinc-200 before:absolute before:top-[-30%] before:left-[-30%] before:text-xl before:text-orange-400 before:content-['shimg'] before:z-[-1]">
-                        SHIM-Groups.
+                    <p className=" absolute text-orange-500 top-[-10%] left-[-10%] opacity-0">
+                        Shim
                     </p>
+                    <h1 className="text-3xl font-bold">Groups</h1>
                 </div>
             )
         case "large":

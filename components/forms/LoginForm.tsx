@@ -176,9 +176,7 @@ export const LoginForm = () => {
                         className="w-full"
                         disabled={isPending}
                         onClick={() => {
-                            {
-                                route.refresh(), console.log("REFRESH")
-                            }
+                            route.refresh()
                         }}
                     >
                         {showTwoFactor ? "Confirm" : "Login"}

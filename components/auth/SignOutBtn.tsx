@@ -1,23 +1,31 @@
-"use client";
-import { signOutAction } from "@/actions/signOut";
-import { Button } from "../ui/button";
-import { CgLogOut } from "react-icons/cg";
+"use client"
+import { signOutAction } from "@/actions/signOut"
+import { Button } from "../ui/button"
+import { CgLogOut } from "react-icons/cg"
+import { useRouter } from "next/navigation"
 
 const SignOutBtn = () => {
-  const onClickHandler = async () => {
-    await signOutAction();
-  };
+    const route = useRouter()
+    const onClickHandler = async () => {
+        await signOutAction().then(() => {
+            route.push("/callback/sign-in")
+        })
+    }
 
-  return (
-    <div className="flex items-center">
-      <Button onClick={() => onClickHandler()} variant={"ghost"} size={"sm"}>
-        <div className="mr-3 flex">Sign Out</div>
-        <div className="text-lg">
-          <CgLogOut />
+    return (
+        <div className="flex items-center">
+            <Button
+                onClick={() => onClickHandler()}
+                variant={"ghost"}
+                size={"sm"}
+            >
+                <div className="mr-3 flex">Sign Out</div>
+                <div className="text-lg">
+                    <CgLogOut />
+                </div>
+            </Button>
         </div>
-      </Button>
-    </div>
-  );
-};
+    )
+}
 
-export default SignOutBtn;
+export default SignOutBtn

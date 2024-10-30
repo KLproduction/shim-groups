@@ -9,7 +9,6 @@ const CompleteSignIn = async (props: Props) => {
     if (!user) redirect("/sign-in")
 
     const authenticated = await onSignInUser(user.id!)
-    console.log("authenticated.status", authenticated.status)
 
     if (authenticated.status === 200) {
         redirect("/group/create")

@@ -22,7 +22,7 @@ export const CardWapper = ({
     showSocial,
 }: CardWrapperProps) => {
     return (
-        <GlassCard className="w-[400px] shadow-md">
+        <GlassCard className="w-[500px] shadow-md">
             <CardHeader>
                 <Header label={headerLabel} />
             </CardHeader>

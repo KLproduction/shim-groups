@@ -15,7 +15,7 @@ const AuthLayout = async ({ children }: Props) => {
     return (
         <>
             <div className="container h-screen flex justify-center items-center relative">
-                <div className="absolute top-10 right-0 ">
+                <div className="absolute top-10 right-0 z-50">
                     <Link href={"/"} className="flex items-center gap-3">
                         <FaBackward />
                         Back to HomePage

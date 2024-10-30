@@ -8,8 +8,10 @@ const RegisterPage = async () => {
         redirect("/setting")
     }
     return (
-        <div className="mt-3">
-            <RegisterForm />
+        <div className="w-screen h-screen flex justify-center items-center flex-col relative">
+            <div className="absolute top-[20%] right-[50%] translate-x-[50%] mb-10 pb-10">
+                <RegisterForm />
+            </div>
         </div>
     )
 }

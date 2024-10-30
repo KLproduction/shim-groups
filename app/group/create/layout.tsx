@@ -1,6 +1,9 @@
 import { BackdropGradient } from "@/components/global/backdrop-gradient"
+import GlassCard from "@/components/global/glass-card"
 import { GradientText } from "@/components/global/gradient-text"
+import GroupLogo from "@/components/GroupLogo"
 import { GROUPLE_CONSTANTS } from "@/constants"
+import Link from "next/link"
 import React from "react"
 
 type Props = {
@@ -9,21 +12,24 @@ type Props = {
 
 const CreateGroupLayout = ({ children }: Props) => {
     return (
-        <div className=" container h-screen grid grid-cols-1 lg-grid-cols-2 content-center">
-            <div className="flex items-center ">
+        <div className="container h-screen flex flex-col items-center ">
+            <Link className="absolute top-10 left-10" href={"/"}>
+                Back
+            </Link>
+            <div className="flex flex-col items-center md:flex-row w-full mb-32 mt-32 justify-center ">
                 <BackdropGradient className="w-8/12 h-2/6 opacity-50">
-                    <h5 className="text-2xl font-bold text-themeTextWhite">
-                        SHIM-Groups
-                    </h5>
                     <GradientText
                         element="H2"
-                        className="text-4xl font-semibold py-1"
+                        className="text-4xl font-semibold py-5 w-full md:min-w-[300px] lg:min-w-[51/2]"
                     >
                         Create your Group
                     </GradientText>
                     <p className="text-themeTextGray">
-                        Free for 14 days, then $99/month. Cancel anytime. All
-                        features. Unlimited everything. No hidden fees.
+                        Free for 14 days, then $99/month. <br />
+                        Cancel anytime. <br />
+                        All features. <br />
+                        Unlimited everything. <br />
+                        No hidden fees.
                     </p>
                     <div className="flex flex-col gap-3 mt-16 pl-5">
                         {GROUPLE_CONSTANTS.createGroupPlaceholder.map(
@@ -41,6 +47,16 @@ const CreateGroupLayout = ({ children }: Props) => {
                         )}
                     </div>
                 </BackdropGradient>
+                <div>
+                    <BackdropGradient
+                        className="w-6/12 h-3/6 opacity-40"
+                        container="lg:items-center max-w-[500px] xl:max-w-[700px] "
+                    >
+                        <GlassCard className="mt-16 py-7 max-w-[500px] xl:max-w-[700px]">
+                            {children}
+                        </GlassCard>
+                    </BackdropGradient>
+                </div>
             </div>
         </div>
     )

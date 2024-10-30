@@ -6,23 +6,47 @@ import { cn } from "@/lib/utils"
 import { MenuIcon } from "lucide-react"
 import Link from "next/link"
 import Menu from "./menu"
-import { useCurrentUser } from "@/hooks/use-current-user"
+
 import Logo from "@/icons/logo"
 import { Logout } from "@/icons"
+import { useEffect, useState } from "react"
+import { ExtenderUser } from "@/next-auth"
+import { currentUser } from "@/lib/auth"
+import { Sign } from "crypto"
+import SignOutBtn from "@/components/auth/SignOutBtn"
+import { useRouter } from "next/navigation"
+import GroupLogo from "@/components/GroupLogo"
 
 const LandingPageNavbar = () => {
-    const user = useCurrentUser()
+    const [user, setUser] = useState<ExtenderUser | null>(null)
+
+    const route = useRouter()
+
+    useEffect(() => {
+        async function getUser() {
+            const user = await currentUser()
+            if (!user) return
+            setUser(user)
+        }
+
+        getUser()
+    }, [])
     return (
         <div
             className={cn(
                 " w-full flex justify-between sticky top-0 items-center py-5 z-50 mx-5 h-24 bg-transparent",
             )}
         >
-            <Logo size="small" />
+            {/* <Logo size="small" /> */}
+            <GroupLogo size="small" />
             <Menu orientation="desktop" />
             <div className=" flex items-center">
                 {user?.id ? (
-                    user.name
+                    <div className="flex items-center gap-3">
+                        {user.name}
+
+                        <SignOutBtn />
+                    </div>
                 ) : (
                     <Link
                         href={"/sign-in"}

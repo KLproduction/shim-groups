@@ -1,4 +1,6 @@
+import LandingPageNavbar from "@/app/(landing)/_components/navbar"
 import CreateGroup from "@/components/forms/create-group"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { onGetAffiliateInfo } from "@/data/groups"
 import { onAuthenticatedUser } from "@/data/user"
@@ -17,13 +19,16 @@ const GroupCreatePage = async ({ searchParams }: Props) => {
     if (!user || !user.id) redirect("/sign-in")
     return (
         <>
-            <div className="px-7 flex flex-col">
-                <h5 className="font-bold text-base text-themeTextWhite">
+            <div className="px-7 flex flex-col w-full">
+                <h5 className="font-bold text-base text-themeTextWhite py-7">
                     Payment Method
                 </h5>
                 <p className="text-themeTextGray leading-tight">
-                    Free for 14 days, then $99/month. Cancel anytime.All
-                    features. Unlimited everything. No hidden fees.
+                    Free for 14 days, then $99/month. <br />
+                    Cancel anytime. <br />
+                    All features. <br />
+                    Unlimited everything. <br />
+                    No hidden fees.
                 </p>
                 {affiliate.status === 200 && (
                     <div className="w-full mt-5 flex justify-center items-center gap-x-2 italic text-themeTextGray text-sm">
@@ -42,7 +47,11 @@ const GroupCreatePage = async ({ searchParams }: Props) => {
                     </div>
                 )}
             </div>
-            {/* <CreateGroup></CreateGroup> */}
+            <CreateGroup
+                userId={user.id}
+                affiliate={affiliate.status === 200 ? true : false}
+                stripeId={affiliate.user?.Group?.User.id || ""}
+            />
         </>
     )
 }

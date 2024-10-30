@@ -1,3 +1,9 @@
+import {
+    AffiliateDuoToneBlack,
+    GlobeDuoToneBlack,
+    IDuotoneBlack,
+    ZapDouToneBlack,
+} from "@/icons"
 import { CreditCard } from "@/icons/credit-card"
 import { Explore } from "@/icons/explore"
 import { Home } from "@/icons/home"
@@ -31,5 +37,39 @@ export const LANDING_PAGE_MENU: MenuProps[] = [
         label: "Explore",
         icon: <Explore />,
         path: "/explore",
+    },
+]
+
+export const SIDEBAR_SETTINGS_MENU: MenuProps[] = [
+    {
+        id: 0,
+        label: "General",
+        icon: <IDuotoneBlack />,
+        path: "",
+    },
+    {
+        id: 1,
+        label: "Subscriptions",
+        icon: <CreditCard />,
+        path: "subscriptions",
+    },
+    {
+        id: 2,
+        label: "Affiliates",
+        icon: <AffiliateDuoToneBlack />,
+        path: "affiliates",
+    },
+    {
+        id: 3,
+        label: "Domain Config",
+        icon: <GlobeDuoToneBlack />,
+        path: "domains",
+    },
+    {
+        id: 4,
+        label: "Integration",
+        icon: <ZapDouToneBlack />,
+        path: "integrations",
+        integration: true,
     },
 ]
