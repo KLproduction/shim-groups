@@ -78,7 +78,6 @@ export const useChannelInfo = () => {
 
   const onKeyDown = (event: KeyboardEvent) => {
     if (edit && event.key === "Enter") {
-      // If the Enter key is pressed and we are in edit mode
       if (inputRef.current?.value) {
         mutate({ name: inputRef.current.value })
       } else {

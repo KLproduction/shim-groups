@@ -158,7 +158,7 @@ const SideBarMenu = ({
                       <Trash
                         onClick={() => onChannelDelete(channel.id)}
                         className={cn(
-                          "group-hover:inline hidden content-end text-themeTextGray hover:text-gray-400",
+                          "group-hover:inline hidden content-end text-themeTextGray hover:text-red-500 ",
                         )}
                         size={16}
                       />

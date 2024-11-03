@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { Button } from "./ui/button";
-import { db } from "@/lib/db";
-import { auth } from "@/auth";
-import { LoginButtonProps } from "./auth/loginBtn";
-import SignOutBtn from "./auth/SignOutBtn";
+import Link from "next/link"
+import { Button } from "./ui/button"
+import { db } from "@/lib/db"
+import { auth } from "@/auth"
+import { LoginButtonProps } from "./auth/loginBtn"
+import SignOutBtn from "./auth/SignOutBtn"
 
 const navList = [
   {
@@ -14,10 +14,10 @@ const navList = [
     label: "Setting",
     path: "/setting",
   },
-];
+]
 
-const Navbar = async () => {
-  const session = await auth();
+const OldNavbar = async () => {
+  const session = await auth()
 
   return (
     <nav className="sticky z-[100] h-30 inset-x-0 top-0 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
@@ -47,7 +47,7 @@ const Navbar = async () => {
         )}
       </ul>
     </nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default OldNavbar

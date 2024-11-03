@@ -3,17 +3,21 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import { TypedUseSelectorHook, useSelector } from "react-redux"
 import { OnlineTracking } from "./slices/online-member-slice"
+import { Search } from "./slices/search-slice"
+import { PostSearch } from "./slices/posts-search-slice"
 
 const rootReducer = combineReducers({
-    onlineTracking: OnlineTracking.reducer,
+  onlineTracking: OnlineTracking.reducer,
+  search: Search.reducer,
+  PostSearch: PostSearch.reducer,
 })
 
 export const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: false,
-        }),
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 })
 
 //we export these type definitions
