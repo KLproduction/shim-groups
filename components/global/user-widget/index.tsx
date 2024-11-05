@@ -10,16 +10,22 @@ type Props = {
   image: string
   groupId: string
   userId: string
+  userName: string
 }
 
-const UserWidget = ({ image, groupId, userId }: Props) => {
+const UserWidget = ({ image, groupId, userId, userName }: Props) => {
   return (
     <div className=" gap-5 items-center hidden md:flex">
       <Notifications />
       <Link href={`/group/${groupId}/message`}>
         <Message />
       </Link>
-      <UserAvatar userId={userId} groupId={groupId} image={image} />
+      <UserAvatar
+        userId={userId}
+        groupId={groupId}
+        image={image}
+        userName={userName}
+      />
     </div>
   )
 }

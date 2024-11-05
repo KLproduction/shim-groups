@@ -3,6 +3,7 @@ import Search from "@/components/global/search"
 import SideBar from "@/components/global/sidebar"
 import UserWidget from "@/components/global/user-widget"
 import { Button } from "@/components/ui/button"
+import OnlineUsersList from "@/hooks/groups/online"
 import { CheckBadge } from "@/icons"
 import { currentUser } from "@/lib/auth"
 import { Menu } from "lucide-react"
@@ -21,6 +22,7 @@ export const Navbar = async ({ groupId, userId }: Props) => {
       <GlassSheet trigger={<Menu className="md:hidden cursor-pointer" />}>
         <SideBar groupId={groupId} userId={userId} mobile={true} />
       </GlassSheet>
+
       <Search
         searchType="POSTS"
         className="rounded-full border-themeGray bg-black !opacity-100 px-3"
@@ -35,7 +37,12 @@ export const Navbar = async ({ groupId, userId }: Props) => {
           Create Group
         </Button>
       </Link>
-      <UserWidget userId={userId} image={user?.image!} groupId={groupId} />
+      <UserWidget
+        userId={userId}
+        image={user?.image!}
+        groupId={groupId}
+        userName={user?.name as string}
+      />
     </div>
   )
 }

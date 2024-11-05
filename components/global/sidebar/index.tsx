@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button"
 import { Group, Plus } from "lucide-react"
 import { v4 } from "uuid"
 import SideBarMenu from "./menu"
+import { usePathname } from "next/navigation"
+import OnlineUsersList from "@/hooks/groups/online"
 
 type Props = {
   groupId: string
@@ -62,6 +64,7 @@ const SideBar = ({ groupId, userId, mobile }: Props) => {
     useSideBar(groupId)
 
   useGroupChatOnline(userId)
+  const pathname = usePathname()
 
   if (!groups || !groups.groups) {
     return (
@@ -123,7 +126,12 @@ const SideBar = ({ groupId, userId, mobile }: Props) => {
         </DropDown>
       )}
       <div className="flex flex-col gap-y-5">
-        <div className="flex justify-between items-center">
+        <div
+          className={cn(
+            "flex justify-between items-center",
+            pathname.includes("/settings") && "hidden",
+          )}
+        >
           <p className="text-xd text-[#F7ECE9]">CHANNELS</p>
           {userId === groupInfo?.group?.userId && (
             <Plus
@@ -154,6 +162,7 @@ const SideBar = ({ groupId, userId, mobile }: Props) => {
           userId={userId}
         />
       </div>
+      {/* <OnlineUsersList /> */}
     </div>
   )
 }

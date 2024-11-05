@@ -18,9 +18,10 @@ type Props = {
   image: string
   groupId: string
   userId: string
+  userName: string
 }
 
-const UserAvatar = ({ image, groupId, userId }: Props) => {
+const UserAvatar = ({ image, groupId, userId, userName }: Props) => {
   const untrackPresence = async () => {
     await supabaseClient.channel("tracking").unsubscribe()
   }
@@ -29,7 +30,7 @@ const UserAvatar = ({ image, groupId, userId }: Props) => {
   const signOut = async () => await signOutAction()
   const onLogout = async () => {
     untrackPresence()
-    dispatch(onOffline({ members: [{ id: userId }] }))
+    dispatch(onOffline({ members: [{ id: userId, userName: userName }] }))
     await signOut()
   }
 

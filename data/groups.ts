@@ -6,6 +6,8 @@ import { z } from "zod"
 import { v4 as uuidv4 } from "uuid"
 import { onAuthenticatedUser } from "./user"
 import { sub } from "date-fns"
+import { revalidatePath } from "next/cache"
+import { stat } from "fs"
 
 export const onGetAffiliateInfo = async (id: string) => {
   try {
@@ -313,6 +315,115 @@ export const onSearchGroups = async (
     return {
       status: 400,
       message: "Oops! something went wrong",
+    }
+  }
+}
+
+export const onUpDateGroupSettings = async (
+  groupId: string,
+  type:
+    | "IMAGE"
+    | "ICON"
+    | "NAME"
+    | "DESCRIPTION"
+    | "JSONDESCRIPTION"
+    | "HTMLDESCRIPTION",
+  content: string,
+  path: string,
+) => {
+  try {
+    if (type === "IMAGE") {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          thumbnail: content,
+        },
+      })
+      revalidatePath(path)
+      return {
+        status: 200,
+      }
+    }
+
+    if (type === "ICON") {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          icon: content,
+        },
+      })
+      revalidatePath(path)
+      return {
+        status: 200,
+      }
+    }
+    if (type === "NAME") {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          name: content,
+        },
+      })
+      revalidatePath(path)
+      return {
+        status: 200,
+      }
+    }
+    if (type === "DESCRIPTION") {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          description: content,
+        },
+      })
+      revalidatePath(path)
+      return {
+        status: 200,
+      }
+    }
+    if (type === "JSONDESCRIPTION") {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          jsonDescription: content,
+        },
+      })
+      revalidatePath(path)
+      return {
+        status: 200,
+      }
+    }
+    if (type === "HTMLDESCRIPTION") {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          htmlDescription: content,
+        },
+      })
+      revalidatePath(path)
+      return {
+        status: 200,
+      }
+    }
+    return {
+      status: 404,
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      status: 400,
     }
   }
 }
