@@ -16,7 +16,7 @@ import { redirect } from "next/navigation"
 
 type Props = {
   image: string
-  groupId: string
+  groupId?: string
   userId: string
   userName: string
 }
@@ -44,10 +44,12 @@ const UserAvatar = ({ image, groupId, userId, userName }: Props) => {
         </Avatar>
       }
     >
-      <Link href={`/group/${groupId}/settings`} className="flex gap-3 p-2">
-        <Settings />
-        Settings
-      </Link>
+      {groupId && (
+        <Link href={`/group/${groupId}/settings`} className="flex gap-3 p-2">
+          <Settings />
+          Settings
+        </Link>
+      )}
       <div
         onClick={onLogout}
         className="flex gap-4 p-2 justify-start w-full border-0 cursor-pointer items-center"

@@ -8,6 +8,7 @@ import { onAuthenticatedUser } from "./user"
 import { sub } from "date-fns"
 import { revalidatePath } from "next/cache"
 import { stat } from "fs"
+import { group } from "console"
 
 export const onGetAffiliateInfo = async (id: string) => {
   try {
@@ -275,6 +276,11 @@ export const onGetAllGroupMembers = async (groupId: string) => {
         members,
       }
     }
+
+    return {
+      status: 404,
+      message: "No members found",
+    }
   } catch (error) {
     return {
       status: 400,
@@ -309,6 +315,28 @@ export const onSearchGroups = async (
       return {
         status: 404,
         message: "No groups found",
+      }
+    }
+    if (mode === "POSTS") {
+      const fetchedPosts = await db.post.findMany({
+        where: {
+          title: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        take: 6,
+        skip: paginate || 0,
+      })
+      if (fetchedPosts && fetchedPosts.length > 0) {
+        return {
+          status: 200,
+          posts: fetchedPosts,
+        }
+      }
+      return {
+        status: 404,
+        message: "No posts found",
       }
     }
   } catch (e) {
@@ -424,6 +452,99 @@ export const onUpDateGroupSettings = async (
     console.error(e)
     return {
       status: 400,
+    }
+  }
+}
+
+export const onGetExploreGroups = async (
+  category: string,
+  paginate: number,
+) => {
+  try {
+    const groups = await db.group.findMany({
+      where: {
+        category,
+        NOT: {
+          description: null,
+          thumbnail: null,
+        },
+      },
+      take: 6,
+      skip: paginate,
+    })
+
+    if (groups) {
+      return {
+        status: 200,
+        groups,
+      }
+    }
+    return {
+      status: 404,
+      message: "No groups found for this category",
+    }
+  } catch (e) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}
+
+export const onGetPaginatedPosts = async (
+  identifier: string,
+  paginate: number,
+) => {
+  try {
+    const user = await onAuthenticatedUser()
+    const posts = await db.post.findMany({
+      where: {
+        channelId: identifier,
+      },
+      skip: paginate,
+      take: 2,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        channel: {
+          select: {
+            name: true,
+          },
+        },
+        author: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+            likes: true,
+          },
+        },
+        likes: {
+          where: {
+            userId: user.id,
+          },
+          select: {
+            id: true,
+            userId: true,
+          },
+        },
+      },
+    })
+    if (posts && posts.length > 0) {
+      return {
+        status: 200,
+        posts,
+      }
+    }
+  } catch (e) {
+    return {
+      status: 404,
+      message: "No posts found",
     }
   }
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  onGetExploreGroups,
   onGetGroupInfo,
   onSearchGroups,
   onUpDateGroupSettings,
@@ -16,7 +17,7 @@ import {
 } from "@/redux/slices/search-slice"
 import { AppDispatch } from "@/redux/store"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { JSONContent } from "novel"
 import { useForm } from "react-hook-form"
@@ -28,6 +29,10 @@ import { toast } from "sonner"
 import { upload } from "@/lib/uploadcare"
 import { useRouter } from "next/navigation"
 import { getUserById } from "@/data/user"
+import {
+  onClearList,
+  onInfiniteScroll,
+} from "@/redux/slices/infinite-scroll-slice"
 
 export const useGroupChatOnline = (userId: string) => {
   const dispatch: AppDispatch = useDispatch()
@@ -338,4 +343,49 @@ export const useGroupSettings = (groupId: string) => {
     setOnDescription,
     onDescription,
   }
+}
+
+export const useGroupList = (query: string) => {
+  const { data } = useQuery({
+    queryKey: [query],
+  })
+
+  const dispatch: AppDispatch = useDispatch()
+
+  useLayoutEffect(() => {
+    dispatch(onClearList({ data: [] }))
+  }, [])
+
+  const { groups, status } = (data || { groups: [], status: 404 }) as {
+    groups: GroupStateProps[]
+    status: number
+  }
+  return {
+    groups,
+    status,
+  }
+}
+
+export const useExploreSlider = (query: string, paginate: number) => {
+  const [onLoadSlider, setOnLoadSlider] = useState(false)
+  const dispatch: AppDispatch = useDispatch()
+  const { data, refetch, isFetching, isFetched } = useQuery({
+    queryKey: ["fetch-group-slides"],
+    queryFn: () => onGetExploreGroups(query, paginate | 0),
+    enabled: false,
+  })
+
+  if (isFetched && data?.status === 200 && data.groups) {
+    dispatch(
+      onInfiniteScroll({
+        data: data.groups,
+      }),
+    )
+  }
+
+  useEffect(() => {
+    setOnLoadSlider(true)
+  }, [])
+
+  return { refetch, isFetching, data, onLoadSlider }
 }

@@ -8,7 +8,7 @@ import UserAvatar from "./user"
 
 type Props = {
   image: string
-  groupId: string
+  groupId?: string
   userId: string
   userName: string
 }

@@ -10,6 +10,8 @@ import { ReduxProvider } from "@/redux/provider"
 import { ReactQueryProvider } from "@/react-query/provider"
 import Navbar from "@/components/OldNavbar"
 import LandingPageNavbar from "./(landing)/_components/navbar"
+import { currentUser } from "@/lib/auth"
+import { revalidatePath } from "next/cache"
 
 const inter = Inter({ subsets: ["latin"] })
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] })
@@ -25,6 +27,11 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const session = await auth()
+  const user = await currentUser()
+
+  if (user) {
+    revalidatePath("/callback/sign-in")
+  }
 
   return (
     <SessionProvider session={session}>

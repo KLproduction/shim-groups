@@ -50,7 +50,7 @@ const Search = ({
           className={cn("bg-transparent border-none ", inPutStyle)}
         />
       </div>
-      <SearchResults searchType={searchType!} />
+      {/* <SearchResults searchType={searchType!} /> */}
     </>
   )
 }

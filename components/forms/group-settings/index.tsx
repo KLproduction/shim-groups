@@ -63,12 +63,12 @@ const GroupSettingsForm = ({ groupId }: Props) => {
         <div className="flex-1 flex- flex-col  py-3 items-start">
           <p>Icon Preview</p>
           <img
-            className="w-20 h-20 rounded-xl my-3"
+            className="w-20 h-20 rounded-xl my-3 object-cover object-center"
             src={
               preViewIcon ||
               (data?.group &&
                 data?.group.icon &&
-                `https://ucaredn.com/${data.group.icon}/`) ||
+                `https://ucarecdn.com/${data.group.icon}/`) ||
               `https://img.freepik.com/premium-vector/default-image-icon-verctor-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg`
             }
             alt="icon"

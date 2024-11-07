@@ -30,9 +30,9 @@ const GroupCard = ({
     <Link href={`/about/${id}`}>
       <Card className="bg-themeBlack border-themeGray rounded-xl overflow-hidden">
         <img
-          src={preview || `https://ucaredn.com/${thumbnail}/`}
+          src={preview || `https://ucarecdn.com/${thumbnail}/`}
           alt="thumbnail"
-          className=" w-full optional-70 h-56"
+          className=" w-full optional-70 h-56 object-cover object-center"
         />
         <div className="p-6">
           <h3 className="text-lg text-themeTextGray font-bold ">{name}</h3>
