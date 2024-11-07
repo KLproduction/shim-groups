@@ -16,7 +16,7 @@ import {
   onSearch,
 } from "@/redux/slices/search-slice"
 import { AppDispatch } from "@/redux/store"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useLayoutEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { JSONContent } from "novel"
@@ -88,7 +88,7 @@ export const useGroupChatOnline = (userId: string) => {
 export const useSearch = (search: "GROUPS" | "POSTS") => {
   const [query, setQuery] = useState("")
   const [debounce, setDebounce] = useState("")
-
+  const queryClient = new QueryClient()
   const dispatch: AppDispatch = useDispatch()
 
   const onSearchQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,6 +122,7 @@ export const useSearch = (search: "GROUPS" | "POSTS") => {
   useEffect(() => {
     if (isFetching) {
       if (data?.type === "GROUPS") {
+        console.log("SEARCHING...", data.data)
         dispatch(
           onSearch({
             isSearching: true,
@@ -160,7 +161,7 @@ export const useSearch = (search: "GROUPS" | "POSTS") => {
       }
     }
     setHasFetched(true)
-  }, [isFetching, isFetched, data, dispatch, debounce, hasFetched])
+  }, [isFetching, isFetched, data, dispatch, debounce])
 
   useEffect(() => {
     if (debounce) {
@@ -168,7 +169,6 @@ export const useSearch = (search: "GROUPS" | "POSTS") => {
       setHasFetched(false)
     } else {
       dispatch(onClearSearch())
-      setHasFetched(false)
     }
   }, [debounce, refetch, dispatch])
 

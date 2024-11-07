@@ -3,6 +3,7 @@
 import { useAppSelector } from "@/redux/store"
 import dynamic from "next/dynamic"
 import ExploreSlider from "./explore-slider"
+import GroupList from "./group-list"
 
 type Props = {
   layout: "SLIDER" | "LIST"
@@ -18,13 +19,15 @@ const ExplorePageContent = ({ layout, category }: Props) => {
   const { isSearching, data, status, debounce } = useAppSelector(
     (state) => state.search,
   )
+
+  console.log("DATA", data)
   return (
     <div className="flex flex-col">
-      {isSearching || debounce ? (
+      {(isSearching || debounce) && status ? (
         <>
           <SearchGroups
             searching={isSearching as boolean}
-            data={data}
+            data={data as any}
             query={debounce}
           />
         </>
@@ -32,6 +35,11 @@ const ExplorePageContent = ({ layout, category }: Props) => {
         status !== 200 &&
         (layout === "SLIDER" ? (
           <>
+            <ExploreSlider
+              label="Personal Development"
+              text="Join top performing personal-development groups"
+              query="personal-development"
+            />
             <ExploreSlider
               label="Fitness"
               text="Join top performing fitness groups"
@@ -43,13 +51,13 @@ const ExplorePageContent = ({ layout, category }: Props) => {
               query="lifestyle"
             />
             <ExploreSlider
-              label="Music"
+              label="music"
               text="Join top performing music groups"
               query="music"
             />
           </>
         ) : (
-          <></>
+          <GroupList category={category as string} />
         ))
       )}
     </div>

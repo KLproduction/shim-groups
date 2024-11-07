@@ -15,19 +15,25 @@ const ExplorePage = async (props: Props) => {
   await query.prefetchQuery({
     queryKey: ["fitness"],
     queryFn: () => {
-      onGetExploreGroups("fitness", 0)
+      return onGetExploreGroups("fitness", 0)
     },
   })
   await query.prefetchQuery({
     queryKey: ["music"],
     queryFn: () => {
-      onGetExploreGroups("music", 0)
+      return onGetExploreGroups("music", 0)
     },
   })
   await query.prefetchQuery({
     queryKey: ["lifestyle"],
     queryFn: () => {
-      onGetExploreGroups("lifestyle", 0)
+      return onGetExploreGroups("lifestyle", 0)
+    },
+  })
+  await query.prefetchQuery({
+    queryKey: ["personal-development"],
+    queryFn: () => {
+      return onGetExploreGroups("personal-development", 0)
     },
   })
   return (
