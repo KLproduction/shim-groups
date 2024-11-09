@@ -548,3 +548,60 @@ export const onGetPaginatedPosts = async (
     }
   }
 }
+
+export const onUpdateGallery = async (groupId: string, content: string) => {
+  try {
+    const isYouTubeLink = (url: string) => {
+      const youtubeRegex =
+        /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/
+      return youtubeRegex.test(url)
+    }
+
+    const convertToEmbedLink = (url: string) => {
+      const youtubeRegex =
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/
+      const match = url.match(youtubeRegex)
+      if (match && match[1]) {
+        return `https://www.youtube.com/embed/${match[1]}`
+      }
+      return url
+    }
+
+    if (isYouTubeLink(content)) {
+      content = convertToEmbedLink(content)
+    }
+
+    const mediaLimit = await db.group.findUnique({
+      where: {
+        id: groupId,
+      },
+      select: {
+        gallery: true,
+      },
+    })
+
+    if (mediaLimit && mediaLimit.gallery.length < 6) {
+      await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          gallery: { push: content },
+        },
+      })
+      revalidatePath(`/about/${groupId}`)
+      return {
+        status: 200,
+      }
+    }
+    return {
+      status: 400,
+      message: "Looks like you have reached the maximum media allowed.",
+    }
+  } catch (e) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}

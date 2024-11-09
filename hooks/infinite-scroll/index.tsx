@@ -22,7 +22,7 @@ export const useInfiniteScroll = (
     isFetched,
     data: paginatedData,
   } = useQuery({
-    queryKey: ["infinite-scroll"],
+    queryKey: ["infinite-scroll", mode, identifier, paginate, query],
     queryFn: async () => {
       if (search) {
         if (mode === "GROUPS") {
@@ -48,9 +48,11 @@ export const useInfiniteScroll = (
     },
     enabled: false,
   })
-  if (isFetched && paginatedData) {
-    dispatch(onInfiniteScroll({ data: paginatedData }))
-  }
+  useEffect(() => {
+    if (isFetched && paginatedData) {
+      dispatch(onInfiniteScroll({ data: paginatedData }))
+    }
+  }, [isFetched, paginatedData, dispatch])
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -58,7 +60,7 @@ export const useInfiniteScroll = (
     })
     observer.observe(observerElement.current as Element)
     return () => observer.disconnect()
-  }, [])
+  }, [refetch, observerElement])
   return {
     observerElement,
     isFetching,

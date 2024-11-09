@@ -18,6 +18,8 @@ type Props = {
 export const SearchGroups = ({ searching, data, query }: Props) => {
   console.log("ACCEPTED-DATA", data)
   const groups = data?.groups || []
+  const enableInfiniteScroll = !searching && groups.length > 5
+  const mode = "GROUPS"
   return (
     <div className="container grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-6 mt-36">
       <Loader loading={searching} className="lg:col-span-3 md:col-span-2">
@@ -27,16 +29,16 @@ export const SearchGroups = ({ searching, data, query }: Props) => {
           <NoResult />
         )}
       </Loader>
-      {groups?.length! > 5 && (
+      {/* {!searching && groups.length > 5 && (
         <InfiniteScrollObserver
-          mode="GROUPS"
-          identifier={query as string}
+          mode={mode}
+          identifier={`${mode}-${query}`}
           paginate={groups?.length}
           search
         >
           <PaginatedGroups />
         </InfiniteScrollObserver>
-      )}
+      )} */}
     </div>
   )
 }

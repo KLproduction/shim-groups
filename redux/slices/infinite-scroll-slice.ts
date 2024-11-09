@@ -14,11 +14,19 @@ export const infiniteScroll = createSlice({
   initialState: initialState,
   reducers: {
     onInfiniteScroll: (state, action: PayloadAction<initialStateProps>) => {
-      const list = state.data.find((data: any) =>
-        action.payload.data.find((payload: any) => data.id === payload.id),
+      const newItems = action.payload.data.filter(
+        (payloadItem: any) =>
+          !state.data.some(
+            (existingItem: any) => existingItem.id === payloadItem.id,
+          ),
       )
 
-      if (!list) state.data = [...state.data, ...action.payload.data]
+      state.data = [...state.data, ...newItems]
+      // const list = state.data.find((data: any) =>
+      //   action.payload.data.find((payload: any) => data.id === payload.id),
+      // )
+
+      // if (!list) state.data = [...state.data, ...action.payload.data]
     },
     onClearList: (state, action) => {
       state.data = action.payload.data

@@ -41,14 +41,14 @@ const ExplorePageContent = ({ layout, category }: Props) => {
               query="personal-development"
             />
             <ExploreSlider
-              label="Fitness"
-              text="Join top performing fitness groups"
-              query="fitness"
-            />
-            <ExploreSlider
               label="Lifestyle"
               text="Join top performing lifestyle groups"
               query="lifestyle"
+            />
+            <ExploreSlider
+              label="Fitness"
+              text="Join top performing fitness groups"
+              query="fitness"
             />
             <ExploreSlider
               label="music"
