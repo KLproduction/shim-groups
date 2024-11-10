@@ -11,7 +11,7 @@ type Props = {
   owner: boolean
 }
 
-const JoinButton = async ({ groupId, owner }: Props) => {
+const JoinButton = ({ groupId, owner }: Props) => {
   const { data, isFetching, isFetched } = useActiveGroupSubscription(groupId)
   const { onJoinFreeGroup } = useJoinFree(groupId)
 
