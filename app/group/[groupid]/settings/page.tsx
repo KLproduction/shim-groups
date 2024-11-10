@@ -1,7 +1,24 @@
 import GroupSettingsForm from "@/components/forms/group-settings"
-import React from "react"
+import { onGetGroupInfo } from "@/data/groups"
+import { onAuthenticatedUser } from "@/data/user"
+import { revalidatePath } from "next/cache"
 
-const GroupSettingsPage = ({ params }: { params: { groupid: string } }) => {
+const GroupSettingsPage = async ({
+  params,
+}: {
+  params: { groupid: string }
+}) => {
+  const user = await onAuthenticatedUser()
+  const group = await onGetGroupInfo(params.groupid)
+  const isOwner = group.groupOwner
+  if (!isOwner) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <h3 className="text-xl font-bold">Access Denied</h3>
+        <p>You do not have permission to view this page.</p>
+      </div>
+    )
+  }
   return (
     <div className="flex flex-col w-full h-full gap-10 px-16 py-10  overflow-auto">
       <div className=" flex flex-col gap-5">

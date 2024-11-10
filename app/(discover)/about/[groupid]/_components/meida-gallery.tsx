@@ -20,7 +20,6 @@ const MediaGallery = ({
   userId,
   groupOwnerId,
 }: Props) => {
-  console.log(validateURLString(gallery[0]))
   return (
     <div className="flex justify-start gap-3 flex-wrap">
       {gallery.length > 0 &&

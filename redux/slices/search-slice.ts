@@ -33,7 +33,6 @@ export const Search = createSlice({
   initialState: InitialState,
   reducers: {
     onSearch: (state, action: PayloadAction<InitialStateProps>) => {
-      console.log("ACTION:", action.payload)
       return { ...action.payload }
     },
     onClearSearch: (state) => {

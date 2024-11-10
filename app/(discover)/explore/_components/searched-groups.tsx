@@ -16,7 +16,6 @@ type Props = {
 }
 
 export const SearchGroups = ({ searching, data, query }: Props) => {
-  console.log("ACCEPTED-DATA", data)
   const groups = data?.groups || []
   const enableInfiniteScroll = !searching && groups.length > 5
   const mode = "GROUPS"

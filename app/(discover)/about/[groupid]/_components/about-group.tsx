@@ -56,13 +56,9 @@ const AboutGroup = ({ userId, groupId }: Props) => {
         <h2 className=" font-bold text-[56px] leading-none md:leading-normal">
           {group.name}
         </h2>
-        <p className="text-themeTextGray leading-none md:mt-2 mt-5">
-          {group.description}
-        </p>
       </div>
       {group.gallery.length > 0 && (
         <div className="relative rounded-xl">
-          {/* <div className="img--overlay absolute h-2/6 bottom-0 w-full z-50" /> */}
           {activeMedia?.type === "IMAGE" ? (
             <img
               src={`https://ucarecdn.com/${activeMedia?.url}/`}
@@ -98,6 +94,7 @@ const AboutGroup = ({ userId, groupId }: Props) => {
         userId={userId}
         groupOwnerId={group.userId}
       />
+
       {!isOwner ? (
         <HTMLparser html={group.htmlDescription || ""} />
       ) : (
@@ -107,6 +104,7 @@ const AboutGroup = ({ userId, groupId }: Props) => {
           className="mt-5 flex flex-col "
         >
           <BlockTextEditor
+            onEdit={onEditDescription}
             max={10000}
             inline
             min={100}
@@ -115,7 +113,7 @@ const AboutGroup = ({ userId, groupId }: Props) => {
             errors={errors}
             setContent={setOnJsonDescription}
             content={onJsonDescription}
-            htmlContent={(group.htmlDescription as string) || undefined}
+            htmlContent={group.htmlDescription as string | undefined}
             setHtmlContent={setOnHtmlDescription}
             textContent={onDescription}
             setTextContent={setOnDescription}

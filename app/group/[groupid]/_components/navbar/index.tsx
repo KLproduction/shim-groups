@@ -23,6 +23,13 @@ export const Navbar = async ({ groupId, userId }: Props) => {
         <SideBar groupId={groupId} userId={userId} mobile={true} />
       </GlassSheet>
 
+      <Link
+        href={`/explore`}
+        className="rounded-3xl bg-themeBlack text-white px-3 py-2"
+      >
+        Explore
+      </Link>
+
       <Search
         searchType="POSTS"
         className="rounded-full border-themeGray bg-black !opacity-100 px-3"

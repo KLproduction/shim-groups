@@ -20,7 +20,6 @@ const ExplorePageContent = ({ layout, category }: Props) => {
     (state) => state.search,
   )
 
-  console.log("DATA", data)
   return (
     <div className="flex flex-col">
       {(isSearching || debounce) && status ? (

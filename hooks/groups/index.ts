@@ -2,7 +2,9 @@
 
 import {
   onGetExploreGroups,
+  onGetGroupChannels,
   onGetGroupInfo,
+  onJoinGroup,
   onSearchGroups,
   onUpdateGallery,
   onUpDateGroupSettings,
@@ -36,6 +38,7 @@ import {
 } from "@/redux/slices/infinite-scroll-slice"
 import { group } from "console"
 import { UpdateGallerySchema } from "@/components/forms/meida-gallery/schema"
+import { onGetActiveSubscriptions } from "@/data/payments"
 
 export const useGroupChatOnline = (userId: string) => {
   const dispatch: AppDispatch = useDispatch()
@@ -125,7 +128,6 @@ export const useSearch = (search: "GROUPS" | "POSTS") => {
   useEffect(() => {
     if (isFetching) {
       if (data?.type === "GROUPS") {
-        console.log("SEARCHING...", data.data)
         dispatch(
           onSearch({
             isSearching: true,
@@ -433,7 +435,9 @@ export const useGroupAbout = (
   )
 
   const jsonContent =
-    jsonDescription !== null ? JSON.parse(jsonDescription) : undefined
+    jsonDescription !== null
+      ? JSON.parse(jsonDescription)
+      : { type: "doc", content: [] }
   const [onJsonDescription, setOnJsonDescription] = useState<
     JSONContent | undefined
   >(jsonContent)
@@ -452,11 +456,9 @@ export const useGroupAbout = (
   } = useForm()
 
   const onSetDescription = () => {
-    if (onEditDescription) {
-      setValue("description", onDescription)
-      setValue("htmldescription", onHtmlDescription)
-      setValue("jsondescription", onJsonDescription)
-    }
+    setValue("description", onDescription)
+    setValue("htmldescription", onHtmlDescription)
+    setValue("jsondescription", onJsonDescription)
   }
 
   useEffect(() => {
@@ -466,11 +468,8 @@ export const useGroupAbout = (
   const onEditTextEditor = (event: Event) => {
     if (editor.current && editor.current.contains(event.target as Node)) {
       setOnEditDescription(true)
-    } else {
-      setOnEditDescription(false)
     }
   }
-
   useEffect(() => {
     document.addEventListener("click", onEditTextEditor, false)
     return () => {
@@ -489,29 +488,29 @@ export const useGroupAbout = (
           `/about/${groupId}`,
         )
         if (updated.status !== 200) {
-          return toast.error("Oops! looks like your form is empty")
+          return toast.error("Oops! looks like your form is empty1")
         }
       }
       if (values.jsondescription) {
         const updated = await onUpDateGroupSettings(
           groupId,
-          "DESCRIPTION",
-          values.jsondescription,
+          "JSONDESCRIPTION",
+          JSON.stringify(values.jsondescription),
           `/about/${groupId}`,
         )
         if (updated.status !== 200) {
-          return toast.error("Oops! looks like your form is empty")
+          return toast.error("Oops! looks like your form is empty2")
         }
       }
       if (values.htmldescription) {
         const updated = await onUpDateGroupSettings(
           groupId,
-          "DESCRIPTION",
+          "HTMLDESCRIPTION",
           values.htmldescription,
           `/about/${groupId}`,
         )
         if (updated.status !== 200) {
-          return toast.error("Oops! looks like your form is empty")
+          return toast.error("Oops! looks like your form is empty3")
         }
       }
       if (
@@ -519,7 +518,7 @@ export const useGroupAbout = (
         !values.jsondescription &&
         !values.htmldescription
       ) {
-        return toast.error("Oops! looks like your form is empty")
+        return toast.error("Oops! looks like your form is empty4")
       }
       return toast.success("Group data updated ")
     },
@@ -530,6 +529,7 @@ export const useGroupAbout = (
 
   const onUpdateDescription = handleSubmit(async (values) => {
     mutate(values)
+    setOnEditDescription(false)
   })
 
   return {
@@ -598,4 +598,27 @@ export const useMediaGallery = (groupId: string) => {
     isPending,
     setValue,
   }
+}
+
+export const useActiveGroupSubscription = (groupId: string) => {
+  const { data, isFetching, isFetched } = useQuery({
+    queryKey: ["active-subscription"],
+    queryFn: () => onGetActiveSubscriptions(groupId),
+  })
+
+  return { data, isFetched, isFetching }
+}
+
+export const useJoinFree = (groupId: string) => {
+  const route = useRouter()
+  const onJoinFreeGroup = async () => {
+    const member = await onJoinGroup(groupId)
+    if (member.status === 200) {
+      const channels = await onGetGroupChannels(groupId)
+      if (channels && channels.channels && channels.status === 200) {
+        route.push(`/group/${groupId}/channel/${channels?.channels[0].id}`)
+      }
+    }
+  }
+  return { onJoinFreeGroup }
 }

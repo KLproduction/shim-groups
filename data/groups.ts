@@ -605,3 +605,36 @@ export const onUpdateGallery = async (groupId: string, content: string) => {
     }
   }
 }
+
+export const onJoinGroup = async (groupId: string) => {
+  try {
+    const user = await onAuthenticatedUser()
+    const member = await db.group.update({
+      where: {
+        id: groupId,
+      },
+      data: {
+        member: {
+          create: {
+            userId: user.id,
+          },
+        },
+      },
+    })
+    if (member) {
+      return {
+        status: 200,
+        message: "Successfully joined group",
+      }
+    }
+    return {
+      status: 400,
+      message: "No group or user found",
+    }
+  } catch (e) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}
