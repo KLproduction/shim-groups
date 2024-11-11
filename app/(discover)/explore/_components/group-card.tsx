@@ -27,7 +27,7 @@ const GroupCard = ({
   privacy,
 }: Props) => {
   return (
-    <Link href={`/about/${id}`}>
+    <Link href={`/about/${id}`} passHref>
       <Card className="bg-themeBlack border-themeGray rounded-xl overflow-hidden">
         <img
           src={preview || `https://ucarecdn.com/${thumbnail}/`}

@@ -14,7 +14,7 @@ type Props = {
 }
 
 const GroupSideWidget = ({ light, groupId, userId }: Props) => {
-  const group = useGroupInfo()
+  const group = useGroupInfo(groupId)
   return (
     <Card
       className={cn(
@@ -25,7 +25,7 @@ const GroupSideWidget = ({ light, groupId, userId }: Props) => {
       <img
         src={`https://ucarecdn.com/${group?.thumbnail}/`}
         alt="thumbnail"
-        className="w-full aspect-video mt-5"
+        className="w-full aspect-video mt-5 object-cover object-center"
       />
 
       <div className="flex flex-col p-5 gap-2">

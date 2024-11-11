@@ -351,8 +351,9 @@ export const useGroupSettings = (groupId: string) => {
 }
 
 export const useGroupList = (query: string) => {
-  const { data } = useQuery({
-    queryKey: [query],
+  const { data, isFetching, isFetched } = useQuery({
+    queryKey: ["groups", query],
+    queryFn: async () => await onGetExploreGroups(query, 0),
   })
 
   const dispatch: AppDispatch = useDispatch()
@@ -365,9 +366,12 @@ export const useGroupList = (query: string) => {
     groups: GroupStateProps[]
     status: number
   }
+  console.log({ groups, status })
   return {
     groups,
     status,
+    isFetching,
+    isFetched,
   }
 }
 
@@ -397,9 +401,9 @@ export const useExploreSlider = (query: string, paginate: number) => {
   return { refetch, isFetching, data, onLoadSlider }
 }
 
-export const useGroupInfo = () => {
+export const useGroupInfo = (groupId: string) => {
   const { data } = useQuery({
-    queryKey: ["about-group-info"],
+    queryKey: ["about-group-info", groupId],
   })
 
   const route = useRouter()

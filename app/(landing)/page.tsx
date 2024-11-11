@@ -1,8 +1,6 @@
 import dynamic from "next/dynamic"
 import { CallToAction } from "./_components/call-to-action/CallToAction"
 import { DashboardSnippet } from "./_components/dashbaord-snippet"
-import { revalidatePath } from "next/cache"
-import { onAuthenticatedUser } from "@/data/user"
 
 const PricingSection = dynamic(
   () =>

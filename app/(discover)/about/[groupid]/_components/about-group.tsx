@@ -15,7 +15,10 @@ type Props = {
 }
 
 const AboutGroup = ({ userId, groupId }: Props) => {
-  const group = useGroupInfo()
+  const group = useGroupInfo(groupId)
+  if (!group) {
+    return <Loader loading={true}>Loading</Loader>
+  }
 
   const {
     setOnDescription,
@@ -33,11 +36,11 @@ const AboutGroup = ({ userId, groupId }: Props) => {
     onJsonDescription,
     editor,
   } = useGroupAbout(
-    group?.description,
-    group?.htmlDescription,
-    group?.jsonDescription,
-    group?.id,
-    group.gallery[0],
+    group?.description!,
+    group?.htmlDescription!,
+    group?.jsonDescription!,
+    group?.id!,
+    group?.gallery[0]!,
   )
 
   if (!group) {
@@ -63,7 +66,7 @@ const AboutGroup = ({ userId, groupId }: Props) => {
             <img
               src={`https://ucarecdn.com/${activeMedia?.url}/`}
               alt="group-img"
-              className="w-full aspect-video z-20 rounded-t-xl"
+              className="w-full aspect-video z-20 rounded-t-xl object-cover object-center"
             />
           ) : activeMedia?.type === "LOOM" ? (
             <div className="w-full aspect-video">

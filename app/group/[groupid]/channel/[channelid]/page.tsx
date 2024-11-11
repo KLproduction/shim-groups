@@ -1,8 +1,13 @@
+import { LeaderBoardCard } from "@/app/group/_components/mobile-nav/leader-board"
 import { onGetChannelInfo } from "@/data/channels"
 import { onGetGroupInfo } from "@/data/groups"
 import { onAuthenticatedUser } from "@/data/user"
 import { currentUser } from "@/lib/auth"
-import { QueryClient } from "@tanstack/react-query"
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query"
 import React from "react"
 
 type Props = {
@@ -30,7 +35,15 @@ const GroupChannelPage = async ({ params }: Props) => {
     },
   })
 
-  return <div>GroupChannelPage</div>
+  return (
+    <HydrationBoundary state={dehydrate(query)}>
+      <div className="grid lg:grid-cols-4 grid-cols-1 w-full flex-1 h-0 gap-x-5 px-5">
+        <div className=" col-span-1 lg:inline relative hidden py-5">
+          <LeaderBoardCard light />
+        </div>
+      </div>
+    </HydrationBoundary>
+  )
 }
 
 export default GroupChannelPage

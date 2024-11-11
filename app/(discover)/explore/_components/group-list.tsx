@@ -20,25 +20,28 @@ type Props = {
 }
 
 const GroupList = ({ category }: Props) => {
-  const { groups, status } = useGroupList("groups")
-  return (
-    <div className="container grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-6 mt-36">
-      {status === 200 ? (
-        groups.map((group: any) => <GroupCard key={group.id} {...group} />)
-      ) : (
-        <NoResult />
-      )}
-      {groups && groups.length > 5 && (
-        <InfiniteScrollObserver
-          mode="GROUPS"
-          identifier={category}
-          paginate={groups.length}
-        >
-          <PaginatedGroups />
-        </InfiniteScrollObserver>
-      )}
-    </div>
-  )
+  const { groups, status, isFetched, isFetching } = useGroupList(category)
+
+  if (isFetched && groups.length > 0) {
+    return (
+      <div className="container grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-6 mt-36">
+        {status === 200 ? (
+          groups.map((group: any) => <GroupCard key={group.id} {...group} />)
+        ) : (
+          <NoResult />
+        )}
+        {groups && groups.length > 5 && (
+          <InfiniteScrollObserver
+            mode="GROUPS"
+            identifier={category}
+            paginate={groups.length}
+          >
+            <PaginatedGroups />
+          </InfiniteScrollObserver>
+        )}
+      </div>
+    )
+  }
 }
 
 export default GroupList
