@@ -8,31 +8,21 @@ import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 const LoginPage = () => {
-    const [user, setUser] = useState<ExtenderUser | null>(null)
-    const [count, setCount] = useState(0)
-    const route = useRouter()
+  const [user, setUser] = useState<ExtenderUser | null>(null)
 
-    useEffect(() => {
-        ;(async () => {
-            const data = await currentUser()
-            if (data?.id) {
-                setUser(data)
-                setCount((p) => p + 1)
-            }
-        })()
-    }, [])
+  const route = useRouter()
 
-    useEffect(() => {
-        if (user) {
-            route.push("/")
-        }
-    }, [count])
+  useEffect(() => {
+    if (user) {
+      route.push("/")
+    }
+  }, [])
 
-    return (
-        <>
-            <LoginForm />
-        </>
-    )
+  return (
+    <>
+      <LoginForm />
+    </>
+  )
 }
 
 export default LoginPage

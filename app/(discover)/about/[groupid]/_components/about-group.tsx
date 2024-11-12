@@ -2,7 +2,7 @@
 
 import NoResult from "@/components/global/search/no-result"
 import { useGroupAbout, useGroupInfo } from "@/hooks/groups"
-import React, { useEffect } from "react"
+
 import MediaGallery from "./meida-gallery"
 import HTMLparser from "@/components/global/html-parser"
 import BlockTextEditor from "@/components/global/rich-text-editor"
