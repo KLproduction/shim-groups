@@ -16,9 +16,6 @@ type Props = {
 
 const AboutGroup = ({ userId, groupId }: Props) => {
   const group = useGroupInfo(groupId)
-  if (!group) {
-    return <Loader loading={true}>Loading</Loader>
-  }
 
   const {
     setOnDescription,
