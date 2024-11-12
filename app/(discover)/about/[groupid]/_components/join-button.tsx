@@ -19,7 +19,11 @@ const JoinButton = ({ groupId, owner }: Props) => {
     if (isFetching) {
       return <div>Loading</div>
     }
-    if (data?.status === 200) {
+    if (
+      data?.status === 200 &&
+      data.subscriptions &&
+      data?.subscriptions?.[0]
+    ) {
       return (
         <GlassModal
           trigger={

@@ -12,6 +12,7 @@ import {
   onCreateNewGroup,
   onGetGroupChannels,
   onGetGroupSubscriptions,
+  onJoinGroup,
 } from "@/data/groups"
 import { CreateGroupSchema } from "@/schemas"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -148,14 +149,16 @@ export const useJoinGroup = (groupId: string) => {
         return toast.error("Oops! something went wrong, try again later")
       }
       if (paymentIntent.status === "succeeded") {
-        // const addMemberResponse = await onAddGroupMember(groupId, userId)
-        const channels = await onGetGroupChannels(groupId)
-        if (channels && channels.channels && channels.status === 200) {
-          toast.success(
-            "You have successfully joined the group, redirecting...",
-          )
+        const member = await onJoinGroup(groupId)
+        if (member.status === 200) {
+          const channels = await onGetGroupChannels(groupId)
+          if (channels && channels.channels && channels.status === 200) {
+            toast.success(
+              "You have successfully joined the group, redirecting...",
+            )
 
-          route.push(`/group/${groupId}/channel/${channels.channels[0].id}`)
+            route.push(`/group/${groupId}/channel/${channels.channels[0].id}`)
+          }
         }
       }
     },

@@ -38,10 +38,11 @@ type GroupDropDownProps = {
 
 export const GroupDropDown = ({ groups, members }: GroupDropDownProps) => {
   const { groups: userGroups } = groups
+  const userGroupIds = userGroups?.map((group) => group.id) || []
 
   return (
     <DropDown
-      title="Owned Groups"
+      title={userGroupIds.length! > 0 ? "Owned Groups" : "No Group"}
       trigger={
         <div className="rounded-2xl hover:bg-themeGray font-medium flex gap-2">
           Shim-Groups
@@ -65,25 +66,27 @@ export const GroupDropDown = ({ groups, members }: GroupDropDownProps) => {
             </Button>
           </Link>
         ))}
-      <Separator orientation="horizontal" />
+      {userGroupIds.length! > 0 && <Separator orientation="horizontal" />}
       {members &&
         members.length > 0 &&
-        members.map((member) => (
-          <Link
-            key={member.Group?.id}
-            href={`/group/${member.Group?.id}/channel/${member.Group?.channel[0].id}`}
-          >
-            <Button
-              variant="ghost"
-              className="flex gap-2 w-full justify-start hover:bg-themeGray items-center"
+        members
+          .filter((member) => !userGroupIds.includes(member.Group?.id!))
+          .map((member) => (
+            <Link
+              key={member.Group?.id}
+              href={`/group/${member.Group?.id}/channel/${member.Group?.channel[0].id}`}
             >
-              <Group />
-              <div className="flex items-center text-zinc-500">
-                {member.Group?.name}
-              </div>
-            </Button>
-          </Link>
-        ))}
+              <Button
+                variant="ghost"
+                className="flex gap-2 w-full justify-start hover:bg-themeGray items-center"
+              >
+                <Group />
+                <div className="flex items-center text-zinc-500">
+                  {member.Group?.name}
+                </div>
+              </Button>
+            </Link>
+          ))}
     </DropDown>
   )
 }

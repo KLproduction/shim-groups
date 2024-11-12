@@ -9,6 +9,7 @@ import { sub } from "date-fns"
 import { revalidatePath } from "next/cache"
 import { stat } from "fs"
 import { group } from "console"
+import { QueryClient } from "@tanstack/react-query"
 
 export const onGetAffiliateInfo = async (id: string) => {
   try {
@@ -635,6 +636,47 @@ export const onJoinGroup = async (groupId: string) => {
     return {
       status: 400,
       message: "Oops! something went wrong",
+    }
+  }
+}
+
+export const onDeleteGallery = async (groupId: string, galleryId: string) => {
+  try {
+    const query = new QueryClient()
+    const group = await db.group.findUnique({
+      where: {
+        id: groupId,
+      },
+    })
+
+    if (group) {
+      const updatedGallery = group.gallery.filter((gal) => gal !== galleryId)
+
+      const updateGroup = await db.group.update({
+        where: {
+          id: groupId,
+        },
+        data: {
+          gallery: updatedGallery,
+        },
+      })
+
+      if (updateGroup) {
+        query.invalidateQueries({ queryKey: ["about-group-info", groupId] })
+        return {
+          status: 200,
+          message: "Gallery deleted",
+        }
+      }
+      return {
+        status: 404,
+        message: "Gallery not found",
+      }
+    }
+  } catch (err) {
+    return {
+      status: 400,
+      message: "Oops, something went wrong, try later",
     }
   }
 }

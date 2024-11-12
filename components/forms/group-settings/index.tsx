@@ -8,12 +8,16 @@ import { useGroupSettings } from "@/hooks/groups"
 import { Label } from "@radix-ui/react-label"
 import { Button } from "@/components/ui/button"
 import { Loader } from "@/components/global/loader"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
 type Props = {
   groupId: string
+  isOwner: boolean
 }
 
-const GroupSettingsForm = ({ groupId }: Props) => {
+const GroupSettingsForm = ({ groupId, isOwner }: Props) => {
   const {
     data,
     register,
@@ -27,6 +31,15 @@ const GroupSettingsForm = ({ groupId }: Props) => {
     setOnDescription,
     onDescription,
   } = useGroupSettings(groupId)
+
+  const route = useRouter()
+
+  useEffect(() => {
+    if (!isOwner) {
+      toast.error("Only owner allowed")
+      route.push(`/explore`)
+    }
+  }, [])
 
   return (
     <form

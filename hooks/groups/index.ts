@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  onDeleteGallery,
   onGetExploreGroups,
   onGetGroupChannels,
   onGetGroupInfo,
@@ -181,8 +182,10 @@ export const useSearch = (search: "GROUPS" | "POSTS") => {
 }
 
 export const useGroupSettings = (groupId: string) => {
+  const query = new QueryClient()
+
   const { data } = useQuery({
-    queryKey: ["group-info"],
+    queryKey: ["group-info", groupId],
     queryFn: () => onGetGroupInfo(groupId),
   })
 
@@ -324,6 +327,9 @@ export const useGroupSettings = (groupId: string) => {
       }
       return toast.success("Group data updated ")
     },
+    onSuccess: () => {
+      query.invalidateQueries({ queryKey: ["group-info", groupId] })
+    },
   })
 
   const route = useRouter()
@@ -429,6 +435,7 @@ export const useGroupAbout = (
   currentMedia: string,
 ) => {
   const editor = useRef<HTMLFormElement | null>(null)
+  const route = useRouter()
   const mediaType = validateURLString(currentMedia)
   const [activeMedia, setActiveMedia] = useState<
     { url: string | undefined; type: string } | undefined
@@ -527,6 +534,7 @@ export const useGroupAbout = (
       return toast.success("Group data updated ")
     },
   })
+
   const onSetActiveMedia = (media: { url: string; type: string }) => {
     setActiveMedia(media)
   }
@@ -536,6 +544,28 @@ export const useGroupAbout = (
     setOnEditDescription(false)
   })
 
+  const { mutate: deleteMutate, isPending: deleteIsPending } = useMutation({
+    mutationFn: async (data: string) => onDeleteGallery(groupId, data),
+    onSuccess: (result) => {
+      if (result?.status === 200) {
+        route.refresh()
+        return toast.success(result.message)
+      }
+      return toast.error(result?.message)
+    },
+    onError: (error) => {
+      console.error("Error occurred:", error)
+      toast.error("An error occurred while deleting the gallery.")
+    },
+    onSettled: (result) => {
+      console.log("Mutation settled:", result)
+    },
+  })
+
+  const onSetDeleteMedia = (galleryId: string) => {
+    deleteMutate(galleryId)
+  }
+
   return {
     setOnDescription,
     setOnHtmlDescription,
@@ -543,6 +573,8 @@ export const useGroupAbout = (
     onSetDescription,
     onUpdateDescription,
     onSetActiveMedia,
+    onSetDeleteMedia,
+    deleteMutate,
     activeMedia,
     onEditDescription,
     isPending,

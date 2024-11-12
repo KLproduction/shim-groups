@@ -6,13 +6,13 @@ import { OAuthStrategy } from "@clerk/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { use, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { LoginSchema } from "@/schemas"
 import { signIn } from "@/auth"
-import { getUserByEmail } from "@/data/user"
+import { getUserByEmail, onAuthenticatedUser } from "@/data/user"
 import { generateTwoFactorToken, generateVerificationToken } from "@/lib/tokens"
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation"
 import { getTwoFactorTokenbyEmail } from "@/data/two-factor-token"
@@ -20,62 +20,64 @@ import { db } from "@/lib/db"
 import { sendVerificationEmail, sendTwoFactorTokenEmail } from "@/lib/mail"
 import { AuthError } from "next-auth"
 import { onNextAuthSignIn } from "@/actions/onNextAuthSignIn"
+import { ExtenderUser } from "@/next-auth"
+import { currentUser } from "@/lib/auth"
 
 type Props = {}
 
 export const useAuthSignIn = () => {
-    const router = useRouter()
-    const {
-        register,
-        formState: { errors },
-        reset,
-        handleSubmit,
-    } = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
-        mode: "onBlur",
+  const router = useRouter()
+  const {
+    register,
+    formState: { errors },
+    reset,
+    handleSubmit,
+  } = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    mode: "onBlur",
+  })
+
+  const nextAuthCheck = async (
+    email: string,
+    password: string,
+    code?: string,
+  ) => {
+    await onNextAuthSignIn(email, password, code).then((res) => {
+      if (res?.status === 200) {
+        reset()
+        router.push("/")
+      } else {
+        return
+      }
     })
+  }
 
-    const nextAuthCheck = async (
-        email: string,
-        password: string,
-        code?: string,
-    ) => {
-        await onNextAuthSignIn(email, password, code).then((res) => {
-            if (res?.status === 200) {
-                reset()
-                router.push("/")
-            } else {
-                return
-            }
-        })
-    }
+  const { mutate: InitiateLoginFlow, isPending } = useMutation({
+    mutationFn: ({
+      email,
+      password,
+      code,
+    }: {
+      email: string
+      password: string
+      code?: string
+    }) => onNextAuthSignIn(email, password, code),
+  })
 
-    const { mutate: InitiateLoginFlow, isPending } = useMutation({
-        mutationFn: ({
-            email,
-            password,
-            code,
-        }: {
-            email: string
-            password: string
-            code?: string
-        }) => onNextAuthSignIn(email, password, code),
+  const onAuthenticateUser = handleSubmit(async (values) => {
+    InitiateLoginFlow({
+      email: values.email,
+      password: values.password,
+      code: values.code,
     })
+  })
 
-    const onAuthenticateUser = handleSubmit(async (values) => {
-        InitiateLoginFlow({
-            email: values.email,
-            password: values.password,
-            code: values.code,
-        })
-    })
-
-    return {
-        onAuthenticateUser,
-        isPending,
-        register,
-        errors,
-    }
+  return {
+    onAuthenticateUser,
+    isPending,
+    register,
+    errors,
+  }
 }
 
 // export const useAuthSignUp = () => {
@@ -174,34 +176,34 @@ export const useAuthSignIn = () => {
 // }
 
 export const useLoginAuth = () => {
-    const { signIn, isLoaded: LoadedSignIn } = useSignIn()
-    const { signUp, isLoaded: LoadedSignUp } = useSignUp()
+  const { signIn, isLoaded: LoadedSignIn } = useSignIn()
+  const { signUp, isLoaded: LoadedSignUp } = useSignUp()
 
-    const signInWith = (strategy: OAuthStrategy) => {
-        if (!LoadedSignIn) return
-        try {
-            return signIn.authenticateWithRedirect({
-                strategy,
-                redirectUrl: "/callback",
-                redirectUrlComplete: "/callback/sign-in",
-            })
-        } catch (error) {
-            console.error(error)
-        }
+  const signInWith = (strategy: OAuthStrategy) => {
+    if (!LoadedSignIn) return
+    try {
+      return signIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/callback",
+        redirectUrlComplete: "/callback/sign-in",
+      })
+    } catch (error) {
+      console.error(error)
     }
+  }
 
-    const signUpWith = (strategy: OAuthStrategy) => {
-        if (!LoadedSignUp) return
-        try {
-            return signUp.authenticateWithRedirect({
-                strategy,
-                redirectUrl: "/callback",
-                redirectUrlComplete: "/",
-            })
-        } catch (error) {
-            console.error(error)
-        }
+  const signUpWith = (strategy: OAuthStrategy) => {
+    if (!LoadedSignUp) return
+    try {
+      return signUp.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/callback",
+        redirectUrlComplete: "/",
+      })
+    } catch (error) {
+      console.error(error)
     }
+  }
 
-    return { signUpWith, signInWith }
+  return { signUpWith, signInWith }
 }

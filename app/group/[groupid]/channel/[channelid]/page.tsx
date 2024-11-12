@@ -23,13 +23,13 @@ const GroupChannelPage = async ({ params }: Props) => {
   const authUser = await onAuthenticatedUser()
 
   await query.prefetchQuery({
-    queryKey: ["channel-info"],
+    queryKey: ["channel-info", params.channelid],
     queryFn: () => {
       return onGetChannelInfo(params.channelid)
     },
   })
   await query.prefetchQuery({
-    queryKey: ["group-info"],
+    queryKey: ["group-info", params.groupid],
     queryFn: () => {
       return onGetGroupInfo(params.groupid)
     },

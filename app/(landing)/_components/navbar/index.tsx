@@ -17,66 +17,58 @@ import SignOutBtn from "@/components/auth/SignOutBtn"
 import { useRouter } from "next/navigation"
 import GroupLogo from "@/components/GroupLogo"
 
-const LandingPageNavbar = () => {
-    const [user, setUser] = useState<ExtenderUser | null>(null)
+type Props = {
+  user: ExtenderUser | null
+}
 
-    const route = useRouter()
+const LandingPageNavbar = ({ user }: Props) => {
+  const route = useRouter()
 
-    useEffect(() => {
-        async function getUser() {
-            const user = await currentUser()
-            if (!user) return
-            setUser(user)
-        }
+  useEffect(() => {
+    if (user) {
+      route.push(`/callback/sign-in`)
+    }
+  }, [])
+  return (
+    <div
+      className={cn(
+        " w-full flex justify-between sticky top-0 items-center py-5 z-50 mx-5 h-24 bg-transparent",
+      )}
+    >
+      {/* <Logo size="small" /> */}
+      <GroupLogo size="small" />
+      <Menu orientation="desktop" />
+      <div className=" flex items-center">
+        {user?.id ? (
+          <div className="flex items-center gap-3">
+            {user.name}
 
-        getUser()
-    }, [])
-    return (
-        <div
-            className={cn(
-                " w-full flex justify-between sticky top-0 items-center py-5 z-50 mx-5 h-24 bg-transparent",
-            )}
+            <SignOutBtn />
+          </div>
+        ) : (
+          <Link href={"/sign-in"} className=" flex items-center gap-3">
+            <Button
+              variant={"outline"}
+              className="bg-themeBlack rounded-2xl flex gap-2 border-themeGray hover:bg-themeGray"
+            >
+              <Logout />
+              Login
+            </Button>
+          </Link>
+        )}
+        <GlassSheet
+          triggerClassName="lg:hidden"
+          trigger={
+            <Button variant={"ghost"} className="hover:bg-transparent">
+              <MenuIcon size={30} />
+            </Button>
+          }
         >
-            {/* <Logo size="small" /> */}
-            <GroupLogo size="small" />
-            <Menu orientation="desktop" />
-            <div className=" flex items-center">
-                {user?.id ? (
-                    <div className="flex items-center gap-3">
-                        {user.name}
-
-                        <SignOutBtn />
-                    </div>
-                ) : (
-                    <Link
-                        href={"/sign-in"}
-                        className=" flex items-center gap-3"
-                    >
-                        <Button
-                            variant={"outline"}
-                            className="bg-themeBlack rounded-2xl flex gap-2 border-themeGray hover:bg-themeGray"
-                        >
-                            <Logout />
-                            Login
-                        </Button>
-                    </Link>
-                )}
-                <GlassSheet
-                    triggerClassName="lg:hidden"
-                    trigger={
-                        <Button
-                            variant={"ghost"}
-                            className="hover:bg-transparent"
-                        >
-                            <MenuIcon size={30} />
-                        </Button>
-                    }
-                >
-                    <Menu orientation="mobile" />
-                </GlassSheet>
-            </div>
-        </div>
-    )
+          <Menu orientation="mobile" />
+        </GlassSheet>
+      </div>
+    </div>
+  )
 }
 
 export default LandingPageNavbar
