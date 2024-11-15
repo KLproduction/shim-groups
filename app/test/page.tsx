@@ -1,64 +1,87 @@
 "use client"
 
-import { onGetUserGroups } from "@/data/groups"
-import { onAuthenticatedUser } from "@/data/user"
-import { useQuery } from "@tanstack/react-query"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
-type Props = {}
+import { ExtenderUser } from "@/next-auth"
+import { currentUser } from "@/lib/auth"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { onGetScrollPost } from "@/data/channels"
+import { PostCard } from "../group/[groupid]/channel/[channelid]/_components/post-feed/post-card"
 
-const Page = (props: Props) => {
-    // Step 1: Get the authenticated user
-    const [userId, setUserId] = useState<string | null>(null)
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const user = await onAuthenticatedUser()
-                if (user && user.id) {
-                    setUserId(user.id)
-                }
-            } catch (error) {
-                console.error("Error fetching authenticated user:", error)
-            }
-        }
-
-        fetchUser()
-    }, [])
-
-    // Step 2: Use `useQuery` to fetch user groups when userId is available
-    const { data, isLoading, isError } = useQuery({
-        queryKey: userId ? ["user-groups", userId] : [], // Provide a valid queryKey when userId is available
-        queryFn: async () => {
-            if (!userId) return null // Return null if no userId is present, to prevent the query from running
-            return await onGetUserGroups(userId)
-        },
-        enabled: !!userId, // Ensure the query only runs if userId is available
-    })
-
-    // Step 3: Conditionally render based on the query states
-    if (isLoading) {
-        return <div>Loading...</div> // Show loading state while fetching
-    }
-
-    if (isError) {
-        return <div>Error fetching data. Please try again later.</div> // Show error state if the query fails
-    }
-
-    if (data?.status === 404) {
-        return <div>No groups found for this user.</div> // Handle case when data is not found
-    }
-
-    return (
-        <div>
-            <h1>Page</h1>
-            <div>
-                <h2>User Groups:</h2>
-                <pre>{JSON.stringify(data, null, 2)}</pre>{" "}
-                {/* Render fetched data */}
-            </div>
-        </div>
-    )
+type Props = {
+  channelId: string
+  userId: string
 }
 
-export default Page
+const TestPage = (props: Props) => {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["channel-info"],
+      queryFn: async ({ pageParam = 0 }) =>
+        await onGetScrollPost(
+          "35763f92-2a1b-4f9e-903b-f29e07fa2901",
+          pageParam,
+        ),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage?.nextPage ?? undefined,
+    })
+  const observerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage()
+      }
+    })
+    if (observerRef.current) observer.observe(observerRef.current)
+    return () => {
+      if (observerRef.current) observer.disconnect()
+    }
+  }, [fetchNextPage, hasNextPage])
+
+  const [user, setUser] = useState<ExtenderUser | null>(null)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await currentUser()
+      if (!user) return
+      setUser(user)
+    }
+    fetchUser()
+  }, [])
+
+  return (
+    <div className="container">
+      {data?.pages.map((page, pageIndex) => (
+        <div key={pageIndex}>
+          {page?.posts?.map((post) => (
+            <div className="w-full h-full m-10 p-10">
+              <PostCard
+                key={post.id}
+                channelname={post.channel.name!}
+                title={post.title!}
+                html={post.htmlContent!}
+                username={post.author.name!}
+                userImage={post.author.image!}
+                likes={post._count.likes}
+                comments={post._count.comments}
+                postId={post.id}
+                likedUser={
+                  post.likes.length > 0 ? post.likes[0].userId : undefined
+                }
+                userId={user?.id}
+                likeId={post.likes.length > 0 ? post.likes[0].id : undefined}
+                channelId={"35763f92-2a1b-4f9e-903b-f29e07fa2901"}
+              />
+            </div>
+          ))}
+        </div>
+      ))}
+      <div ref={observerRef}>
+        {isFetchingNextPage ? "Loading more..." : "posts"}
+      </div>
+    </div>
+  )
+}
+
+export default TestPage
