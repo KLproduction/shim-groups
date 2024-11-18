@@ -55,7 +55,7 @@ const TestPage = (props: Props) => {
       {data?.pages.map((page, pageIndex) => (
         <div key={pageIndex}>
           {page?.posts?.map((post) => (
-            <div className="w-full h-full m-10 p-10">
+            <div className="w-full h-full m-10 p-10" key={post.id}>
               <PostCard
                 key={post.id}
                 channelname={post.channel.name!}
