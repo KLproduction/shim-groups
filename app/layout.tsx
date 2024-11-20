@@ -44,7 +44,7 @@ export default async function RootLayout({
           >
             <ReduxProvider>
               <ReactQueryProvider>
-                <div className="h-full w-screen ">{children}</div>
+                <div className="h-full w-full ">{children}</div>
               </ReactQueryProvider>
             </ReduxProvider>
             <Toaster />

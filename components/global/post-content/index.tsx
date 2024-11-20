@@ -1,6 +1,7 @@
 "use client"
 import BlockTextEditor from "@/components/global/rich-text-editor"
 import { Button } from "@/components/ui/button"
+import { DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useCreateChannelPost } from "@/hooks/channels"
 
@@ -45,6 +46,7 @@ export const PostContent = ({ channelid }: PostContentProps) => {
         //ts-ignore
         setHtmlContent={setOnHtmlDescription}
       />
+
       <Button className="self-end rounded-2xl bg-themeTextGray flex gap-x-2">
         <Upload />
         Create

@@ -71,7 +71,7 @@ const GroupLayout = async ({ children, params }: Props) => {
         <SideBar groupId={params.groupid} userId={user.id} />
         <div className="md:ml-[300px] flex flex-col flex-1 bg-[#101011] md:rounded-tl-xl overflow-y-auto border-l-[1px] border-t-[1px] border-zinc-800">
           <Navbar groupId={params.groupid} userId={user.id} />
-          {children}
+          <div className="pb-12 md:pb-0">{children}</div>
           <MobileNav groupId={params.groupid} userId={user.id} />
         </div>
       </div>

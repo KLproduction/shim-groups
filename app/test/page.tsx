@@ -7,79 +7,17 @@ import { currentUser } from "@/lib/auth"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { onGetScrollPost } from "@/data/channels"
 import { PostCard } from "../group/[groupid]/channel/[channelid]/_components/post-feed/post-card"
+import Header from "./hander"
 
-type Props = {
-  channelId: string
-  userId: string
-}
+type Props = {}
 
 const TestPage = (props: Props) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ["channel-info"],
-      queryFn: async ({ pageParam = 0 }) =>
-        await onGetScrollPost(
-          "35763f92-2a1b-4f9e-903b-f29e07fa2901",
-          pageParam,
-        ),
-      initialPageParam: 0,
-      getNextPageParam: (lastPage) => lastPage?.nextPage ?? undefined,
-    })
-  const observerRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage()
-      }
-    })
-    if (observerRef.current) observer.observe(observerRef.current)
-    return () => {
-      if (observerRef.current) observer.disconnect()
-    }
-  }, [fetchNextPage, hasNextPage])
-
-  const [user, setUser] = useState<ExtenderUser | null>(null)
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await currentUser()
-      if (!user) return
-      setUser(user)
-    }
-    fetchUser()
-  }, [])
-
   return (
-    <div className="container">
-      {data?.pages.map((page, pageIndex) => (
-        <div key={pageIndex}>
-          {page?.posts?.map((post) => (
-            <div className="w-full h-full m-10 p-10" key={post.id}>
-              <PostCard
-                key={post.id}
-                channelname={post.channel.name!}
-                title={post.title!}
-                html={post.htmlContent!}
-                username={post.author.name!}
-                userImage={post.author.image!}
-                likes={post._count.likes}
-                comments={post._count.comments}
-                postId={post.id}
-                likedUser={
-                  post.likes.length > 0 ? post.likes[0].userId : undefined
-                }
-                userId={user?.id}
-                likeId={post.likes.length > 0 ? post.likes[0].id : undefined}
-                channelId={"35763f92-2a1b-4f9e-903b-f29e07fa2901"}
-              />
-            </div>
-          ))}
-        </div>
-      ))}
-      <div ref={observerRef}>
-        {isFetchingNextPage ? "Loading more..." : "posts"}
-      </div>
+    <div className="max-w-[100vw]">
+      <div className="h-[calc(100vh-3rem)] bg-red-500 w-full bg-fixed"></div>
+      <div className="left-0 w-full sticky top-0 h-12 bg-blue-500"></div>
+      <div className="h-screen  bg-zinc-500"></div>
+      <div className="h-screen  bg-green-500"></div>
     </div>
   )
 }

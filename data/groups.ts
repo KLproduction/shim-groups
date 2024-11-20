@@ -122,6 +122,10 @@ export const onGetGroupInfo = async (groupId: string) => {
       where: {
         id: groupId,
       },
+      include: {
+        channel: true,
+        courses: true,
+      },
     })
 
     if (group) {

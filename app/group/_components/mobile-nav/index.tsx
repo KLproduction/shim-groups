@@ -16,7 +16,7 @@ const MobileNav = async ({ groupId, userId }: Props) => {
   const user = await onAuthenticatedUser()
 
   return (
-    <div className=" bg-zinc-700 w-screen py-3 flex px-11 fixed bottom-0 z-50 md:hidden justify-between items-center">
+    <div className=" bg-zinc-700 w-screen py-3 flex px-11 fixed bottom-0 z-50 md:hidden justify-between items-center h-12">
       <Link href={`/explore/`}>
         <Home className="h-7 w-7" />
       </Link>
