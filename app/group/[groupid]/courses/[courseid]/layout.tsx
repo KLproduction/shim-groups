@@ -18,14 +18,14 @@ type Props = {
 const layout = async ({ params, children }: Props) => {
   const query = new QueryClient()
   await query.prefetchQuery({
-    queryKey: ["course-modules"],
+    queryKey: ["course-modules", params.courseid],
     queryFn: () => onGetCourseModules(params.courseid),
   })
   return (
     <HydrationBoundary state={dehydrate(query)}>
       <div className=" grid grid-cols-1 lg:grid-cols-4 h-full overflow-hidden">
         <div className=" bg-themeBlack p-5 overflow-y-auto">
-          <div className="h-screen">
+          <div className="">
             <CreateCourseModule
               courseId={params.courseid}
               groupId={params.groupid}

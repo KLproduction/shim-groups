@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { useCreateChannelPost } from "@/hooks/channels"
 
 import { Upload } from "lucide-react"
+import { Dispatch } from "react"
 
 type PostContentProps = {
   channelid: string
@@ -43,7 +44,6 @@ export const PostContent = ({ channelid }: PostContentProps) => {
         setContent={setJsonDescription}
         setTextContent={setOnDescription}
         htmlContent={onHtmlDescription}
-        //ts-ignore
         setHtmlContent={setOnHtmlDescription}
       />
 

@@ -271,3 +271,53 @@ export const onCreateModuleSection = async (
     }
   }
 }
+
+export const onDeleteModule = async (moduleId: string) => {
+  try {
+    const module = await db.module.delete({
+      where: {
+        id: moduleId,
+      },
+    })
+    if (module) {
+      return {
+        status: 200,
+        message: "Module successfully deleted",
+      }
+    }
+    return {
+      status: 404,
+      message: "Module not found",
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}
+
+export const onGetSectionInfo = async (sectionId: string) => {
+  try {
+    const section = await db.section.findUnique({
+      where: {
+        id: sectionId,
+      },
+    })
+    if (section) {
+      return {
+        status: 200,
+        section,
+      }
+    }
+    return {
+      status: 404,
+      message: "Section not found",
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}

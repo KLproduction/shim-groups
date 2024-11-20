@@ -5,6 +5,7 @@ import {
   onGetChannelInfo,
   onLikeChannelPost,
 } from "@/data/channels"
+import { onGetSectionInfo, onUpdateSection } from "@/data/course"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   useMutation,
@@ -140,7 +141,7 @@ export const useCreateChannelPost = (channelid: string) => {
     undefined,
   )
 
-  const [onHtmlDescription, setOnHtmlDescription] = useState<string | "">("")
+  const [onHtmlDescription, setOnHtmlDescription] = useState<string>("")
 
   const {
     formState: { errors },
@@ -270,4 +271,31 @@ export const useLikeChannelPost = (postid: string, channelId: string) => {
   })
 
   return { mutate, isPending }
+}
+
+export const useSectionNavBar = (sectionId: string, courseId: string) => {
+  const { data } = useQuery({
+    queryKey: ["section-info", sectionId],
+    queryFn: () => onGetSectionInfo(sectionId),
+  })
+
+  const query = useQueryClient()
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: () => onUpdateSection(sectionId, "COMPLETE", ""),
+    onSuccess: (data) => {
+      return data?.status !== 200
+        ? toast.error(data?.message)
+        : toast.success(data?.message)
+    },
+    onSettled: async () => {
+      await query.invalidateQueries({
+        queryKey: ["section-info", sectionId],
+      })
+      await query.invalidateQueries({
+        queryKey: ["course-modules", courseId],
+      })
+    },
+  })
+  return { data, isPending, mutate }
 }

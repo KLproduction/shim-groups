@@ -3,6 +3,7 @@ import {
   onCreateCourseModule,
   onCreateGroupCourse,
   onCreateModuleSection,
+  onDeleteModule,
   onGetCourseModules,
   onUpdateModule,
   onUpdateSection,
@@ -121,7 +122,7 @@ export const useCreateModule = (courseId: string, groupId: string) => {
   const query = useQueryClient()
 
   const { data } = useQuery({
-    queryKey: ["group-info"],
+    queryKey: ["group-info", groupId],
     queryFn: () => onGetGroupInfo(groupId),
   })
 
@@ -138,10 +139,13 @@ export const useCreateModule = (courseId: string, groupId: string) => {
     },
     onSettled: async () => {
       await query.invalidateQueries({
-        queryKey: ["group-info"],
+        queryKey: ["group-info", groupId],
       })
       await query.invalidateQueries({
         queryKey: ["create-module"],
+      })
+      await query.invalidateQueries({
+        queryKey: ["course-modules", courseId],
       })
     },
   })
@@ -174,7 +178,7 @@ export const useCourseModule = (courseId: string, groupId: string) => {
   const [moduleId, setModuleId] = useState<string | undefined>(undefined)
 
   const { data } = useQuery({
-    queryKey: ["course-modules"],
+    queryKey: ["course-modules", courseId],
     queryFn: () => onGetCourseModules(courseId),
   })
 
@@ -200,7 +204,7 @@ export const useCourseModule = (courseId: string, groupId: string) => {
     },
     onSettled: async () => {
       await query.invalidateQueries({
-        queryKey: ["course-modules"],
+        queryKey: ["course-modules", courseId],
       })
     },
   })
@@ -212,15 +216,20 @@ export const useCourseModule = (courseId: string, groupId: string) => {
   } = useMutation({
     mutationFn: (data: { type: "NAME" | "COMPLETE"; content: string }) =>
       onUpdateSection(activeSection!, data.type, data.content),
-    onMutate: () => setEditSection(false),
+    onMutate: () => {
+      return (
+        setEditSection(false),
+        console.log("Triggering mutation with data:", inputRef?.current?.value!)
+      )
+    },
     onSuccess: (data) => {
       return data?.status !== 200
         ? toast.error(data?.message)
         : toast.success(data?.message)
     },
     onSettled: async () => {
-      await query.invalidateQueries({
-        queryKey: ["course-modules"],
+      await query.refetchQueries({
+        queryKey: ["course-modules", courseId],
       })
     },
   })
@@ -238,30 +247,51 @@ export const useCourseModule = (courseId: string, groupId: string) => {
         : toast.success(data?.message)
     },
     onSettled: async () => {
-      await query.invalidateQueries({
-        queryKey: ["course-modules"],
+      await query.refetchQueries({
+        queryKey: ["course-modules", courseId],
       })
     },
   })
-  const onEditModuleName = (e: Event) => {
-    if (inputRef.current && triggerRef.current) {
-      if (
-        !inputRef.current.contains(e.target as Node | null) &&
-        !triggerRef.current.contains(e.target as Node | null)
-      ) {
-        if (inputRef.current.value) {
-          mutate({ type: "NAME", content: inputRef.current.value })
-        } else {
-          setEdit(false)
-        }
+
+  const onEditModuleName = (event: Event) => {
+    if (!edit) return
+
+    const target = event.target as Node | null
+
+    if (
+      inputRef.current &&
+      !inputRef.current.contains(target) &&
+      (!triggerRef.current || !triggerRef.current.contains(target)) &&
+      (!contentRef.current || !contentRef.current.contains(target))
+    ) {
+      if (inputRef.current.value) {
+        mutate({
+          type: "NAME",
+          content: inputRef.current.value,
+        })
+      } else {
+        setEdit(false)
       }
     }
   }
-  const onEditSectionName = (e: Event) => {
-    if (sectionInputRef.current && triggerRef.current) {
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (edit && event.key === "Enter") {
+      if (inputRef.current?.value) {
+        mutate({
+          type: "NAME",
+          content: inputRef.current.value,
+        })
+      } else {
+        setEdit(false)
+      }
+    }
+  }
+  const onEditSectionName2 = (event: Event) => {
+    if (sectionInputRef.current && contentRef.current) {
       if (
-        !sectionInputRef.current.contains(e.target as Node | null) &&
-        !triggerRef.current.contains(e.target as Node | null)
+        !sectionInputRef.current.contains(event.target as Node | null) &&
+        !contentRef.current.contains(event.target as Node | null)
       ) {
         if (sectionInputRef.current.value) {
           updateSection({
@@ -274,14 +304,56 @@ export const useCourseModule = (courseId: string, groupId: string) => {
       }
     }
   }
+  const onEditSectionName = (event: Event) => {
+    if (sectionInputRef.current && contentRef.current) {
+      if (
+        !sectionInputRef.current.contains(event.target as Node | null) &&
+        !contentRef.current.contains(event.target as Node | null)
+      ) {
+        if (sectionInputRef.current.value) {
+          updateSection({
+            type: "NAME",
+            content: sectionInputRef.current.value,
+          })
+        } else {
+          setEditSection(false)
+        }
+      }
+    }
+  }
+
   useEffect(() => {
     document.addEventListener("click", onEditModuleName, false)
-    return () => document.removeEventListener("click", onEditModuleName, false)
-  }, [moduleId])
+    inputRef.current?.addEventListener("keydown", onKeyDown)
+
+    return () => {
+      document.removeEventListener("click", onEditModuleName, false)
+      inputRef.current?.removeEventListener("keydown", onKeyDown)
+    }
+  }, [moduleId, edit])
+
   useEffect(() => {
     document.addEventListener("click", onEditSectionName, false)
-    return () => document.removeEventListener("click", onEditSectionName, false)
+    return () => {
+      document.removeEventListener("click", onEditSectionName, false)
+    }
   }, [activeSection])
+
+  const { mutate: deleteModule } = useMutation({
+    mutationFn: (moduleId: string) => {
+      return onDeleteModule(moduleId)
+    },
+    onSettled: async () => {
+      await query.refetchQueries({
+        queryKey: ["course-modules", courseId],
+      })
+    },
+    onSuccess: (data) => {
+      return data?.status !== 200
+        ? toast.error(data?.message)
+        : toast.success(data?.message)
+    },
+  })
 
   const onEditModule = (id: string) => {
     setEdit(true)
@@ -307,5 +379,8 @@ export const useCourseModule = (courseId: string, groupId: string) => {
     sectionUpdatePending,
     updateVariables,
     data,
+    inputRef,
+    deleteModule,
+    editSection,
   }
 }

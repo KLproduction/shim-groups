@@ -3,7 +3,7 @@
 import GlobalAccordion from "@/components/global/accordion"
 import { Button } from "@/components/ui/button"
 import { useCreateModule } from "@/hooks/courses"
-import { Plus, PlusCircle } from "lucide-react"
+import { Plus, PlusCircle, Trash } from "lucide-react"
 
 type Props = {
   courseId: string
@@ -27,14 +27,14 @@ const CreateCourseModule = ({ courseId, groupId }: Props) => {
         />
       </div>
       {variables && isPending && (
-        <GlobalAccordion id={variables.moduleId} title={variables.title}>
-          <Button
-            variant={"outline"}
-            className=" bg-transparent border-themeGray text-themeTextGray mt-2 flex items-center gap-3"
-          >
-            <Plus />
+        <div className=" flex gap-3 items-center">
+          <Button variant={"ghost"}>
+            <Trash size={16} className=" text-red-500" />
           </Button>
-        </GlobalAccordion>
+          <GlobalAccordion id={variables.moduleId} title={variables.title}>
+            <></>
+          </GlobalAccordion>
+        </div>
       )}
     </div>
   )

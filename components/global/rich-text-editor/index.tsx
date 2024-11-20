@@ -40,7 +40,7 @@ type Props = {
   inline?: boolean
   disabled?: boolean
   htmlContent?: string | undefined
-  setHtmlContent?: React.Dispatch<React.SetStateAction<string | undefined>>
+  setHtmlContent?: React.Dispatch<React.SetStateAction<string>>
 }
 
 const BlockTextEditor = ({
