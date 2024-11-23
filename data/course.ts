@@ -321,3 +321,40 @@ export const onGetSectionInfo = async (sectionId: string) => {
     }
   }
 }
+
+export const onUpdateCourseSectionContent = async (
+  sectionId: string,
+  htmlcontent: string,
+  jsoncontent: string,
+  content: string,
+) => {
+  try {
+    const section = await db.section.update({
+      where: {
+        id: sectionId,
+      },
+      data: {
+        htmlContent: htmlcontent,
+        JsonContent: jsoncontent,
+        content,
+      },
+    })
+
+    if (section) {
+      return {
+        status: 200,
+        section,
+        message: "Section successfully updated",
+      }
+    }
+    return {
+      status: 404,
+      message: "Section not found",
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}

@@ -1,5 +1,7 @@
 "use client"
 
+import axios from "axios"
+
 import {
   onActivateSubscription,
   onCreateNewGroupSubscription,
@@ -233,5 +235,25 @@ export const useAllSubscriptions = (groupId: string) => {
   return {
     data,
     mutate,
+  }
+}
+
+export const useStripeConnect = (groupId: string) => {
+  const [onStripeAccountPending, setOnStripeAccountPending] = useState(false)
+  const onStripeConnect = async () => {
+    try {
+      setOnStripeAccountPending(true)
+      const account = await axios.get(`/api/stripe/connect?groupid=${groupId}`)
+      if (account) {
+        setOnStripeAccountPending(false)
+        window.location.href = account.data.url
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  return {
+    onStripeConnect,
+    onStripeAccountPending,
   }
 }

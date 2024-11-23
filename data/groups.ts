@@ -684,3 +684,209 @@ export const onDeleteGallery = async (groupId: string, galleryId: string) => {
     }
   }
 }
+
+export const onGetAffiliateLink = async (groupId: string) => {
+  try {
+    const affiliate = await db.affiliate.findUnique({
+      where: {
+        groupId: groupId,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (affiliate) {
+      return {
+        status: 200,
+        affiliate,
+      }
+    }
+    return {
+      status: 404,
+    }
+  } catch (e) {
+    return {
+      status: 400,
+    }
+  }
+}
+
+export const onVerifyAffiliateLink = async (id: string) => {
+  try {
+    const link = await db.affiliate.findUnique({
+      where: { id },
+    })
+    if (link) {
+      return {
+        status: 200,
+      }
+    }
+    return {
+      status: 404,
+    }
+  } catch (e) {
+    return {
+      status: 400,
+    }
+  }
+}
+
+export const onGetUserFromMembership = async (membershipId: string) => {
+  try {
+    const member = await db.members.findUnique({
+      where: {
+        id: membershipId,
+      },
+      select: {
+        User: true,
+      },
+    })
+    if (member) {
+      return {
+        status: 200,
+        user: member,
+      }
+    }
+    return {
+      status: 404,
+    }
+  } catch (e) {
+    return {
+      status: 400,
+    }
+  }
+}
+
+export const onGetAllUserMessages = async (recieverId: string) => {
+  try {
+    const sender = await onAuthenticatedUser()
+    const messages = await db.message.findMany({
+      where: {
+        senderid: {
+          in: [sender.id!, recieverId],
+        },
+        recieverId: {
+          in: [sender.id!, recieverId],
+        },
+      },
+    })
+
+    if (messages && messages.length > 0) {
+      return { status: 200, messages }
+    }
+
+    return { status: 404 }
+  } catch (error) {
+    return { status: 400, message: "Oops something went wrong" }
+  }
+}
+
+export const onGetPostInfo = async (postId: string) => {
+  try {
+    const user = await onAuthenticatedUser()
+    const post = await db.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        channel: {
+          select: {
+            name: true,
+          },
+        },
+        author: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
+        },
+        likes: {
+          where: {
+            userId: user.id!,
+          },
+          select: {
+            userId: true,
+            id: true,
+          },
+        },
+        comments: true,
+      },
+    })
+
+    if (post) {
+      return { status: 200, post }
+    }
+    return { status: 404, message: "No post found" }
+  } catch (e) {
+    return { status: 400, message: "Oops something went wrong" }
+  }
+}
+
+export const onGetPostComments = async (postId: string) => {
+  try {
+    const comments = await db.comment.findMany({
+      where: {
+        postId: postId,
+        replied: false,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: true,
+        _count: {
+          select: {
+            reply: true,
+          },
+        },
+      },
+    })
+
+    if (comments && comments.length > 0) {
+      return { status: 200, comments }
+    }
+
+    return { status: 404, message: "No comments found" }
+  } catch (e) {
+    return { status: 400, message: "Oops something went wrong" }
+  }
+}
+
+export const onGetCommentReplies = async (commentId: string) => {
+  try {
+    const replies = await db.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: {
+        reply: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    })
+    if (replies && replies.reply && replies.reply.length > 0) {
+      return {
+        status: 200,
+        replies: replies.reply,
+      }
+    }
+    return {
+      status: 404,
+      message: "No replies found",
+    }
+  } catch (e) {
+    return {
+      status: 400,
+      message: "Oops something went wrong",
+    }
+  }
+}

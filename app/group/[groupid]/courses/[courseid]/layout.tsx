@@ -24,7 +24,7 @@ const layout = async ({ params, children }: Props) => {
   return (
     <HydrationBoundary state={dehydrate(query)}>
       <div className=" grid grid-cols-1 lg:grid-cols-4 h-full overflow-hidden">
-        <div className=" bg-themeBlack p-5 overflow-y-auto">
+        <div className=" bg-themeBlack p-5 overflow-y-auto h-screen">
           <div className="">
             <CreateCourseModule
               courseId={params.courseid}

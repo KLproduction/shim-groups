@@ -16,11 +16,13 @@ const SectionPage = async ({ params }: Props) => {
   const group = await onGetGroupInfo(params.groupid)
 
   return (
-    <CourseContentForm
-      groupId={group.group?.userId!}
-      sectionId={params.sectionid}
-      userId={user.id!}
-    />
+    <div className="p-5">
+      <CourseContentForm
+        groupUserId={group.group?.userId!}
+        sectionId={params.sectionid}
+        userId={user.id!}
+      />
+    </div>
   )
 }
 

@@ -24,8 +24,6 @@ const CompleteSignIn = async (props: Props) => {
   if (authenticated.status !== 200) {
     redirect("/")
   }
-
-  return <DiscoverLoading />
 }
 
 export default CompleteSignIn

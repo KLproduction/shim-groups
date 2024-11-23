@@ -2,6 +2,7 @@
 
 import {
   onDeleteGallery,
+  onGetAllGroupMembers,
   onGetExploreGroups,
   onGetGroupChannels,
   onGetGroupInfo,
@@ -31,7 +32,7 @@ import { GroupSettingsSchema } from "@/components/forms/group-settings/schema"
 import { on } from "events"
 import { toast } from "sonner"
 import { upload } from "@/lib/uploadcare"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { getUserById } from "@/data/user"
 import {
   onClearList,
@@ -657,4 +658,15 @@ export const useJoinFree = (groupId: string) => {
     }
   }
   return { onJoinFreeGroup }
+}
+
+export const useGroupChat = (groupId: string) => {
+  const { data } = useQuery({
+    queryKey: ["member-chat", groupId],
+    queryFn: () => onGetAllGroupMembers(groupId),
+  })
+
+  const pathname = usePathname()
+
+  return { data, pathname }
 }

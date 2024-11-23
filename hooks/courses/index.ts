@@ -1,3 +1,4 @@
+import { CourseContentSchema } from "@/components/forms/course-content-form/schema"
 import { CreateCourseSchema } from "@/components/global/create-course/sechma"
 import {
   onCreateCourseModule,
@@ -5,6 +6,8 @@ import {
   onCreateModuleSection,
   onDeleteModule,
   onGetCourseModules,
+  onGetSectionInfo,
+  onUpdateCourseSectionContent,
   onUpdateModule,
   onUpdateSection,
 } from "@/data/course"
@@ -13,6 +16,7 @@ import { upload } from "@/lib/uploadcare"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { usePathname } from "next/navigation"
+import { JSONContent } from "novel"
 import { use, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -382,5 +386,110 @@ export const useCourseModule = (courseId: string, groupId: string) => {
     inputRef,
     deleteModule,
     editSection,
+  }
+}
+
+export const useCourseSectionInfo = (sectionId: string) => {
+  const { data } = useQuery({
+    queryKey: ["section-info", sectionId],
+    queryFn: () => onGetSectionInfo(sectionId),
+  })
+  return { data }
+}
+
+export const useCourseContent = (
+  sectionId: string,
+  description: string | null,
+  jsonDescription: string | null,
+  htmlDescription: string | null,
+) => {
+  const jsonContent =
+    jsonDescription !== null ? JSON.parse(jsonDescription as string) : undefined
+
+  const [onJsonDescription, setOnJsonDescription] = useState<
+    JSONContent | undefined
+  >(jsonContent)
+  const [onDescription, setOnDescription] = useState<string | undefined>(
+    description || undefined,
+  )
+  const [onHtmlDescription, setOnHtmlDescription] = useState<string>(
+    htmlDescription || "",
+  )
+  const editor = useRef<HTMLFormElement | null>(null)
+  const [onEditDescription, setOnEditDescription] = useState(false)
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    setValue,
+  } = useForm<z.infer<typeof CourseContentSchema>>({
+    resolver: zodResolver(CourseContentSchema),
+  })
+
+  const onSetDescriptions = () => {
+    const JsonContent = JSON.stringify(onJsonDescription)
+    setValue("jsoncontent", JsonContent)
+    setValue("content", onDescription)
+    setValue("htmlcontent", onHtmlDescription)
+  }
+
+  useEffect(() => {
+    onSetDescriptions()
+    return () => {
+      onSetDescriptions()
+    }
+  }, [onJsonDescription, onDescription])
+
+  const onEditTextEditor = (event: Event) => {
+    if (editor.current) {
+      !editor.current.contains(event.target as Node | null)
+        ? setOnEditDescription(false)
+        : setOnEditDescription(true)
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener("click", onEditTextEditor, false)
+    return () => {
+      document.removeEventListener("click", onEditTextEditor, false)
+    }
+  }, [])
+
+  const query = useQueryClient()
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: { values: z.infer<typeof CourseContentSchema> }) =>
+      onUpdateCourseSectionContent(
+        sectionId,
+        data.values.htmlcontent!,
+        data.values.jsoncontent!,
+        data.values.content!,
+      ),
+    onSuccess: (data) => {
+      return data?.status !== 200
+        ? toast.error(data?.message)
+        : toast.success(data?.message)
+    },
+    onSettled: async () => {
+      await query.invalidateQueries({
+        queryKey: ["section-info", sectionId],
+      })
+    },
+  })
+
+  const onUpdateContent = handleSubmit(async (values) => {
+    mutate({ values })
+  })
+
+  return {
+    errors,
+    onUpdateContent,
+    setOnJsonDescription,
+    setOnDescription,
+    onEditDescription,
+    setOnHtmlDescription,
+    editor,
+    isPending,
   }
 }

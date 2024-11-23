@@ -2,6 +2,9 @@
 
 import { db } from "@/lib/db"
 import { onAuthenticatedUser } from "./user"
+import { use } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { onGetCommentReplies } from "./groups"
 
 export const onGetChannelInfo = async (channelId: string) => {
   try {
@@ -194,5 +197,81 @@ export const onGetScrollPost = async (
       status: 404,
       message: "No posts found",
     }
+  }
+}
+
+export const onCreateNewComment = async (
+  postId: string,
+  content: string,
+  commentId: string,
+) => {
+  try {
+    const user = await onAuthenticatedUser()
+    const comment = await db.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        comments: {
+          create: {
+            id: commentId,
+            userId: user.id!,
+            content,
+          },
+        },
+      },
+    })
+    if (comment) {
+      return { status: 200, message: "Comment successfully created" }
+    }
+    return { status: 404, message: "Post not found" }
+  } catch (error) {
+    return {
+      status: 400,
+      message: "Oops! something went wrong",
+    }
+  }
+}
+
+export const useGetReplies = (commentId: string) => {
+  const { isFetching, data } = useQuery({
+    queryKey: ["comment-replies", commentId],
+    queryFn: () => onGetCommentReplies(commentId),
+    enabled: Boolean(commentId),
+  })
+  return { data, isFetching }
+}
+
+export const onCreateCommentReply = async (
+  commentId: string,
+  comment: string,
+  replyId: string,
+  postId: string,
+) => {
+  try {
+    const user = await onAuthenticatedUser()
+
+    const reply = await db.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        reply: {
+          create: {
+            content: comment,
+            id: replyId,
+            userId: user.id!,
+            replied: true,
+            postId: postId,
+          },
+        },
+      },
+    })
+
+    if (reply) {
+      return { status: 200, message: "Reply successfully created" }
+    }
+  } catch (error) {
+    return { status: 400, message: "Oops! something went wrong" }
   }
 }
