@@ -18,7 +18,7 @@ const page = async ({ params }: Props) => {
   return (
     <div className="flex-1 grid grid-cols-1 p-5 content-start lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {INTEGRATION_LIST_ITEMS.map((item) => (
-        <Card className="bg-themeBlack border-themeDarkGray">
+        <Card className="bg-themeBlack border-themeDarkGray" key={item.name}>
           <CardContent className="flex flex-col p-5 gap-2">
             <div className="flex min-w-full justify-between items-start gap-20">
               <div>
